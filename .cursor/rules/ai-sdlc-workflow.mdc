@@ -1,0 +1,166 @@
+---
+description: Enforces the AI Software Development Lifecycle across PM, Architect, Developer, and QA agents. Acts as a workflow state machine — phases must be followed in order and gates must be explicitly approved before proceeding.
+alwaysApply: true
+---
+
+# AI Software Development Lifecycle — Workflow Rule
+
+This rule enforces a Spec-Driven + Test-Driven workflow using OpenSpec as the documentation system. The assistant must follow the lifecycle phases in strict order and must refuse to skip phases.
+
+---
+
+## Lifecycle Phases
+
+```
+0  Task Classification
+1  PM Phase (requirements)
+   ── Gate A: PM APPROVED ──
+2  Architect Phase (design + tasks)
+   ── Gate B: ARCH APPROVED ──
+3  Developer Phase (TDD implementation)
+4  QA Review Loop
+5  Final Test Summary
+6  Change Summary + Cleanup
+```
+
+Never jump ahead or skip a phase.
+
+---
+
+## Phase 0 — Task Classification
+
+When a new feature, bug, or refactor request arrives:
+
+1. Classify as one of: **Bug Fix** | **Small Change** | **New Feature** | **Major Refactor**
+2. Provide short reasoning for the classification.
+3. Proceed to Phase 1.
+
+---
+
+## Phase 1 — PM Phase
+
+Invoke the **PM Agent** (`pm-agent`). It must:
+
+- Read OpenSpec specs and relevant context.
+- Clarify requirements with the user using option-based questions.
+- Create an OpenSpec change workspace.
+- Generate OpenSpec templates via CLI.
+- Populate proposal/requirements using a PM Brief.
+
+**Stop after PM output and request approval.**
+
+---
+
+## Gate A — PM Approval
+
+Stop and ask the user to review the proposal.
+
+Continue **only** when the user replies exactly:
+
+> **PM APPROVED**
+
+If approval is missing, refuse to proceed and explain that PM approval is required.
+
+---
+
+## Phase 2 — Architect Phase
+
+Invoke the **Architect Agent** (`architect-agent`). It must:
+
+- Read the OpenSpec change workspace.
+- Ask major technical decision questions (only when needed).
+- Generate `design.md` and `tasks.md` using OpenSpec templates.
+- Define the test strategy.
+- Produce an ordered task list.
+
+**Stop after Architect output and request approval.**
+
+---
+
+## Gate B — Architect Approval
+
+Stop and ask the user to review the design and tasks.
+
+Continue **only** when the user replies exactly:
+
+> **ARCH APPROVED**
+
+No implementation may begin before this gate.
+
+---
+
+## Phase 3 — Developer Phase
+
+After Architect approval:
+
+1. Present the task list from `tasks.md` and ask the user to choose a task.
+2. Invoke the **Developer Agent** (`dev-agent`) for the selected task only.
+3. The Developer must use strict TDD (tests first, then implementation).
+4. Update task status in OpenSpec on completion.
+
+---
+
+## Phase 4 — QA Review Loop
+
+After each task is implemented:
+
+1. Invoke the **QA Agent** (`qa-agent`).
+2. QA produces a structured review with categorized findings.
+3. If QA **fails** (Blockers or Major issues remain):
+   - Developer fixes the issues.
+   - QA re-reviews.
+   - Repeat until **QA PASS**.
+
+---
+
+## Phase 5 — Final Test Summary
+
+Before closing the change, produce a Test Summary containing:
+
+| Field | Required |
+|-------|----------|
+| Test command(s) executed | Yes |
+| Test suites run | Yes |
+| Total tests | Yes |
+| Passed / Failed / Skipped | Yes |
+| Notes (if tests could not run locally) | If applicable |
+
+This step is mandatory and cannot be skipped.
+
+---
+
+## Phase 6 — Change Summary + Cleanup
+
+After QA passes:
+
+1. **Delivered Change Summary** — include:
+   - Change title
+   - Short description
+   - Tasks completed
+   - Test summary
+   - Breaking changes (if any)
+
+2. **Append to `openspec/DELIVERED.md`** — create the file if it does not exist.
+
+3. **Update OpenSpec artifacts**:
+   - Mark completed tasks in `tasks.md`.
+   - Update spec files to reflect the new truth.
+
+---
+
+## Enforcement Rules
+
+The assistant **must refuse** to:
+
+- Write code before both PM and Architect approvals are granted.
+- Skip the QA review phase.
+- Close a change without producing a Final Test Summary.
+- Skip documentation updates in Phase 6.
+
+If the user attempts to bypass any phase, politely explain the required phase and continue the workflow correctly.
+
+---
+
+## Tone
+
+Professional, structured, and helpful. Enforce the workflow while remaining collaborative.
