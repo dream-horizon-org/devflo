@@ -1,13 +1,14 @@
 # daisdlc
 
-AI Software Development Lifecycle for [Cursor](https://cursor.com). Installs a complete set of rules, agents, and skills into any project's `.cursor/` directory via a single CLI command.
+AI Software Development Lifecycle for [Cursor](https://cursor.com). Installs a complete set of rules, agents, commands, and skills into any project's `.cursor/` directory via a single CLI command.
 
 ## What's Included
 
 | Category | Files | Purpose |
 |----------|-------|---------|
-| **Rules** | `ai-sdlc-workflow.mdc`, `must-follow.mdc` | Enforces the full SDLC lifecycle (Phases 0-6) with approval gates, and coding standards (DRY, linting, test-first, 800-line limit) |
+| **Rules** | `ai-sdlc-workflow.mdc`, `must-follow.mdc` | Enforces the full SDLC lifecycle with approval gates, and coding standards (DRY, linting, test-first, 800-line limit) |
 | **Agents** | `pm-agent.md`, `architect-agent.md`, `dev-agent.md`, `qa-agent.md` | Specialized agents for Product Management, Architecture, Development (TDD), and QA Review |
+| **Commands** | `daisdlc.md`, `daisdlc-plan.md`, `daisdlc-design.md`, etc. | Slash commands for driving individual SDLC phases or the full lifecycle explicitly |
 | **Skills** | `documentation-steward`, `reuse-before-write` | Automates OpenSpec documentation lifecycle and enforces reuse-first development |
 
 ## Prerequisites
@@ -44,7 +45,7 @@ Navigate to your project directory and run:
 daisdlc init
 ```
 
-This copies all SDLC rules, agents, and skills into your project's `.cursor/` directory.
+This copies all SDLC rules, agents, commands, and skills into your project's `.cursor/` directory.
 
 You can also specify a path:
 
@@ -74,6 +75,14 @@ your-project/
     │   ├── dev-agent.md
     │   ├── pm-agent.md
     │   └── qa-agent.md
+    ├── commands/
+    │   ├── daisdlc.md
+    │   ├── daisdlc-plan.md
+    │   ├── daisdlc-design.md
+    │   ├── daisdlc-implement.md
+    │   ├── daisdlc-audit.md
+    │   ├── daisdlc-status.md
+    │   └── daisdlc-deliver.md
     ├── rules/
     │   ├── ai-sdlc-workflow.mdc
     │   └── must-follow.mdc
@@ -86,6 +95,79 @@ your-project/
 ```
 
 Existing files in `.cursor/` that don't conflict with daisdlc files are left untouched. Files with the same name are overwritten.
+
+## Commands
+
+daisdlc installs Cursor slash commands that let you drive the SDLC pipeline explicitly. Type `/` in the Cursor chat input to see all available commands.
+
+### Two ways to use the SDLC
+
+1. **Automatic (rule-based):** Just describe your request in chat. The `ai-sdlc-workflow.mdc` rule automatically classifies it, selects the pipeline, and orchestrates phases in sequence with approval gates.
+
+2. **Manual (command-driven):** Use the `/daisdlc-*` commands to invoke each phase yourself. This gives you full control over when each phase runs, and works across chat sessions since state is persisted in `status.yaml` inside the OpenSpec change workspace.
+
+### Full lifecycle command
+
+| Command | Description |
+|---------|-------------|
+| `/daisdlc <request>` | Run the complete SDLC pipeline from classification through delivery. Equivalent to the automatic rule, but invoked explicitly. Useful when the rule doesn't apply or you want to guarantee the full lifecycle runs. |
+
+### Individual phase commands
+
+Run phases one at a time, in any chat session. Each command checks prerequisites before proceeding.
+
+| Command | Phase | Description |
+|---------|-------|-------------|
+| `/daisdlc-plan <request>` | Plan | Classifies the request, creates the OpenSpec change workspace, and invokes the PM Agent to produce a requirements brief. Stops at the **PM APPROVED** gate. |
+| `/daisdlc-design <change-name>` | Design | Invokes the Architect Agent to produce `design.md` and `tasks.md`. Requires PM approval. Stops at the **ARCH APPROVED** gate. |
+| `/daisdlc-implement <change-name> [task]` | Implement | Invokes the Developer Agent for a specific task using strict TDD. Requires Architect approval. If no task number is given, presents the task list for selection. |
+| `/daisdlc-audit <change-name>` | Audit | Invokes the QA Agent to review the implementation against OpenSpec artifacts. Reports pass/fail with categorized findings. |
+| `/daisdlc-deliver <change-name>` | Deliver | Runs the final test summary, integration verification, produces the delivered change summary, and appends to `DELIVERED.md`. |
+
+### Utility command
+
+| Command | Description |
+|---------|-------------|
+| `/daisdlc-status [change-name]` | Shows the current phase status of a specific change, or lists all active changes. Suggests the next command to run. |
+
+### Example: manual workflow
+
+```
+# Session 1 — Plan
+/daisdlc-plan Add rate limiting to the API
+→ PM Brief produced, awaiting approval
+PM APPROVED
+
+# Session 2 — Design
+/daisdlc-design add-rate-limiting
+→ Design + task list produced, awaiting approval
+ARCH APPROVED
+
+# Session 3 — Implement + Audit
+/daisdlc-implement add-rate-limiting 1
+→ Task 1 implemented with TDD
+/daisdlc-audit add-rate-limiting
+→ QA passed
+
+# Session 4 — Deliver
+/daisdlc-implement add-rate-limiting 2
+→ Task 2 implemented
+/daisdlc-audit add-rate-limiting
+→ QA passed
+/daisdlc-deliver add-rate-limiting
+→ Change delivered
+```
+
+### State management
+
+Commands persist state in `openspec/changes/<change-name>/status.yaml`, which tracks:
+
+- Classification and pipeline
+- Phase statuses (pending, in_progress, complete, approved, pass, fail)
+- Gate approvals with timestamps
+- Task completion progress
+
+This enables **cross-session resumability** — start a change in one chat, continue it in another. Run `/daisdlc-status` at any time to see where you left off.
 
 ## Quick Start (TL;DR)
 
@@ -110,6 +192,7 @@ daisdlc/
 ├── templates/
 │   └── cursor/                 # Distributable assets (shipped in the npm package)
 │       ├── agents/
+│       ├── commands/
 │       ├── rules/
 │       └── skills/
 ├── src/
@@ -133,7 +216,7 @@ npm install
 npm run build
 ```
 
-### Editing Rules, Agents, or Skills
+### Editing Rules, Agents, Commands, or Skills
 
 The canonical source for SDLC content lives in `.cursor/` at the project root. Edit files there, then sync them to `templates/cursor/` before publishing:
 

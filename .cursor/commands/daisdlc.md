@@ -125,7 +125,7 @@ Invoke the **Architect Agent** (`architect-agent` subagent) with:
 - The classification and pipeline
 - Instruction to read `proposal.md` for the approved PM Brief
 - Instruction to explore the codebase as needed
-- Instruction to ask key architectural decisions using `AskQuestion`
+- **MANDATORY instruction: The Architect MUST use the `AskQuestion` tool to ask the user at least one architectural or implementation approach question BEFORE writing the full design.** For New Feature and Major Refactor, the Architect must ask about key trade-offs (technology choices, data model decisions, API design alternatives). Skipping questions is only acceptable when the implementation has literally one possible approach with zero alternatives.
 - Instruction to produce `design.md` and `tasks.md` in the change workspace
 
 After the Architect Agent completes, update `status.yaml`:
@@ -153,12 +153,12 @@ If the user does not approve, wait. Do not proceed without explicit approval.
 
 > **[Implement]** | Change: `<change-name>` | Classification: `<type>` | Pipeline: `<pipeline>`
 
-### Task Selection
+### Task Selection — Automatic
 
 - For **Trivial**: Proceed directly — the change itself is the single task.
-- For all others: Present the task list from `tasks.md` and ask the user to choose a task.
+- For all others: **Auto-select tasks in dependency order.** Do NOT ask the user to choose a task. Read `tasks.md`, resolve the dependency graph, and start with tasks that have no pending dependencies. If multiple tasks are independent (no dependencies on each other), they may be executed in parallel or sequentially — use judgment based on whether they touch overlapping files.
 
-### For each selected task:
+### For each task:
 
 1. Update `status.yaml` to set `phases.developer.current_task`.
 2. Invoke the **Developer Agent** (`dev-agent` subagent) with:
@@ -199,23 +199,23 @@ Invoke the **QA Agent** (`qa-agent` subagent) with:
 
 Update `phases.qa.status` to `pass`.
 
-- If tasks remain in `tasks_pending`: return to **Implement** — present remaining tasks and ask the user to pick the next one.
-- If all tasks are done: proceed to **Test Summary**.
+- If tasks remain in `tasks_pending`: **immediately return to Implement** and auto-select the next task(s) in dependency order. Do NOT ask the user to pick.
+- If all tasks are done: **immediately proceed to Test Summary**. Do NOT ask for permission.
 
 ### If Audit fails:
 
 Update `phases.qa.status` to `fail`.
 
-Present the findings to the user.
+- **Surgical fixes**: The Developer Agent fixes the issues automatically using the targeted checklist.
+- **Structural fixes**: Return to Implement for rework automatically.
 
-- **Surgical fixes**: Provide the targeted checklist. The Developer Agent fixes the issues.
-- **Structural fixes**: Return to Implement for rework.
-
-After fixes, re-invoke the QA Agent. **Repeat until Audit passes.**
+After fixes, re-invoke the QA Agent. **Repeat until Audit passes.** Do NOT ask the user for permission between fix-and-recheck cycles.
 
 ---
 
 ## Test Summary + Integration Verification (skip for Trivial)
+
+**This phase starts automatically after QA passes. Do NOT ask for permission. After completing, immediately proceed to Deliver.**
 
 > **[Test Summary]** | Change: `<change-name>` | Classification: `<type>` | Pipeline: `<pipeline>`
 
@@ -245,6 +245,8 @@ Update `phases.test_summary.status` in `status.yaml` to `complete`.
 ---
 
 ## Deliver — Change Summary + Cleanup
+
+**This phase starts automatically after Test Summary completes. Do NOT ask for permission.**
 
 > **[Deliver]** | Change: `<change-name>` | Classification: `<type>` | Pipeline: `<pipeline>`
 
@@ -297,6 +299,11 @@ You **must refuse** to:
 - Deliver a change without producing a Final Test Summary (non-Trivial)
 - Skip documentation updates in the Deliver phase
 - Proceed past a gate without explicit approval text
+
+You **must NEVER**:
+
+- Suggest switching to Plan mode, Ask mode, or any other interaction mode. Always operate in Agent mode.
+- Ask for permission to proceed to the next phase. Phase transitions are automatic — the only pause points are Gate A (PM Approval) and Gate B (Architect Approval). After any gate is passed or phase completes, immediately proceed to the next phase without asking.
 
 ---
 

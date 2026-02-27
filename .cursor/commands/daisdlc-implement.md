@@ -24,10 +24,9 @@ If the user provided a task number, use that task. Verify it exists in `tasks.md
 
 If no task number was provided:
 
-- Read `tasks.md` and present the full task list with their current statuses.
-- Highlight which tasks are `pending` and their dependency order.
-- Ask the user to choose a task number.
-- **Wait for the user's selection before proceeding.**
+- Read `tasks.md` and resolve the dependency graph.
+- **Auto-select the next task(s) in dependency order.** Pick tasks whose dependencies are all completed. If multiple tasks are independent (no dependencies on each other), they may be executed in parallel or sequentially — use judgment based on whether they touch overlapping files.
+- **Do NOT ask the user to choose a task.** Proceed immediately with the auto-selected task(s).
 
 ### 3. Update State
 
@@ -56,11 +55,9 @@ After the Developer Agent finishes, update `status.yaml`:
 - Move the task number from `tasks_pending` to `tasks_completed`
 - Remove `current_task`
 
-### 6. Next Steps
+### 6. Next Steps — Automatic Advancement
 
-Tell the user:
+- If more tasks remain: **Immediately loop back to Step 2** and auto-select the next task(s) in dependency order. Do NOT stop to ask the user.
+- If all tasks are done: **Immediately proceed to the Audit phase** — invoke `/daisdlc-audit <change-name>` behavior (validate prerequisites, invoke QA Agent).
 
-- If more tasks remain: "Remaining tasks: <list>. Run `/daisdlc-implement <change-name> <next-task>` for the next task, or `/daisdlc-audit <change-name>` to review completed work."
-- If all tasks are done: "All tasks complete. Run `/daisdlc-audit <change-name>` to start the quality audit."
-
-**Do NOT auto-advance. Stop here.**
+**Do NOT stop and ask for permission. Phase transitions are automatic.**

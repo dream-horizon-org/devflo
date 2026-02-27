@@ -29,7 +29,7 @@ Invoke the **Architect Agent** (`architect-agent` subagent) with a prompt that i
 - Instruction to read `proposal.md` for the approved PM Brief
 - Instruction to read existing codebase context as needed
 - Instruction to produce `design.md` and `tasks.md` in the change workspace
-- Instruction to ask key architectural decisions using `AskQuestion`
+- **MANDATORY instruction: The Architect MUST use the `AskQuestion` tool to ask the user at least one architectural or implementation approach question BEFORE writing the full design.** For New Feature and Major Refactor, the Architect must ask about key trade-offs (technology choices, data model decisions, API design alternatives). Skipping questions is only acceptable when the implementation has literally one possible approach with zero alternatives.
 - For **Small Change** classification: the Architect may produce a minimal design but must still validate its approach with the user via at least one confirmation question (unless the implementation has literally one possible approach)
 
 Wait for the Architect Agent to complete its work.
@@ -54,6 +54,4 @@ phases:
     approved_at: <current ISO date>
 ```
 
-Confirm approval and tell the user they can run `/daisdlc-implement <change-name> <task-number>` to start implementing tasks.
-
-**Do NOT auto-advance to the Implement phase. Stop here.**
+After approval, **immediately proceed to the Implement phase** — auto-select tasks in dependency order and begin implementation. Do NOT stop to ask the user which task to start.

@@ -156,8 +156,8 @@ Invoke the **Architect Agent** (`architect-agent`). It must:
 
 - Read the OpenSpec change workspace.
 - Resolve any open questions or risks flagged by the PM phase.
-- Ask architectural and implementation approach decision questions.
-- Validate the proposed approach with the user before writing the full design.
+- **MANDATORY: Use the `AskQuestion` tool to ask the user at least one architectural or implementation approach question before writing the full design.** For New Feature and Major Refactor classifications, the Architect must ask about key trade-offs (e.g., technology choices, data model decisions, API design alternatives). Skipping questions entirely is only acceptable when the implementation has literally one possible approach with zero alternatives — this is extremely rare for New Feature and Major Refactor.
+- Validate the proposed approach with the user based on their answers before writing the full design.
 - Generate `design.md` and `tasks.md` using OpenSpec templates.
 - Define the test strategy.
 - Produce an ordered task list.
@@ -184,10 +184,11 @@ No implementation may begin before this gate.
 
 After Architect approval (or directly after Phase 0 for Trivial changes):
 
-1. Present the task list from `tasks.md` and ask the user to choose a task.
-2. Invoke the **Developer Agent** (`dev-agent`) for the selected task only.
+1. **Auto-select tasks in dependency order.** Do NOT ask the user to choose a task. Read `tasks.md`, resolve the dependency graph, and start with tasks that have no pending dependencies. If multiple tasks are independent (no dependencies on each other), they may be executed in parallel or sequentially — use judgment based on whether they touch overlapping files.
+2. Invoke the **Developer Agent** (`dev-agent`) for each task.
 3. The Developer must use strict TDD (tests first, then implementation).
 4. Update task status in OpenSpec on completion.
+5. After each task completes, immediately proceed to the next pending task (or to the QA phase if all tasks are done). **Do NOT pause to ask the user which task to do next.**
 
 For **Trivial** changes, the Developer may proceed without a formal task list — the change itself is the single task.
 
@@ -195,14 +196,15 @@ For **Trivial** changes, the Developer may proceed without a formal task list �
 
 ## Phase 4 — QA Review Loop
 
-After each task is implemented:
+**This phase starts automatically after all tasks are implemented. Do NOT ask the user for permission to start QA.**
 
 1. Invoke the **QA Agent** (`qa-agent`).
 2. QA produces a structured review with categorized findings.
 3. If QA **fails** (Blockers or Major issues remain):
-   - Developer fixes the issues using the QA's targeted feedback.
+   - Developer fixes the issues automatically using the QA's targeted feedback.
    - QA re-reviews only the previously flagged issues plus any new changes.
    - Repeat until **QA PASS**.
+4. When QA passes, **immediately proceed to Phase 5** without asking the user.
 
 ### QA Loop Cost Control
 
@@ -215,6 +217,8 @@ To minimize re-invocation overhead:
 ---
 
 ## Phase 5 — Final Test Summary + Integration Verification
+
+**This phase starts automatically after QA passes. Do NOT ask the user for permission. After completing the test summary, immediately proceed to Phase 6.**
 
 Before closing the change, the orchestrator must:
 
@@ -248,7 +252,7 @@ This step is mandatory and cannot be skipped.
 
 ## Phase 6 — Change Summary + Cleanup
 
-After QA passes:
+**This phase starts automatically after Phase 5 completes. Do NOT ask the user for permission.**
 
 1. **Delivered Change Summary** — include:
    - Change title
@@ -316,6 +320,11 @@ The assistant **must refuse** to:
 - Skip documentation updates in Phase 6.
 - Process a SKIP QA command for non-Trivial classifications.
 - Proceed past a gate without explicit approval text.
+
+The assistant **must NEVER**:
+
+- Suggest switching to Plan mode, Ask mode, or any other interaction mode. The SDLC workflow always operates in Agent mode. If the IDE or framework offers a mode switch, ignore it and continue in Agent mode.
+- Ask for permission to proceed to the next phase after a gate has been passed or a phase has completed. Phase transitions are automatic — the only pause points are the explicit approval gates (Gate A and Gate B).
 
 If the user attempts to bypass any phase, politely explain the required phase and continue the workflow correctly.
 

@@ -49,7 +49,7 @@ Wait for the QA Agent to complete its work.
 
 Update `phases.qa.status` in `status.yaml` to `pass`.
 
-Tell the user: "QA passed. Run `/daisdlc-deliver <change-name>` to produce the test summary and deliver the change."
+**Immediately proceed to the Deliver phase** — invoke `/daisdlc-deliver <change-name>` behavior (test summary, change summary, cleanup). Do NOT stop to ask the user for permission.
 
 **If QA fails** (Blockers or Major issues remain):
 
@@ -62,9 +62,7 @@ phases:
     findings_count: <number of blockers + majors>
 ```
 
-Present the QA findings to the user. Advise them:
+- **Surgical fixes**: The Developer Agent fixes the issues automatically using the targeted checklist, then re-run QA.
+- **Structural fixes**: Return to Implement automatically to address the structural issues, then re-run QA.
 
-- **Surgical fixes**: Provide the targeted checklist from QA. The user can fix them directly, then re-run `/daisdlc-audit <change-name>`.
-- **Structural fixes**: Suggest running `/daisdlc-implement <change-name> <task>` to address the structural issues, then re-run `/daisdlc-audit <change-name>`.
-
-**Do NOT auto-advance. Stop here.**
+**Repeat the fix → re-audit loop automatically until QA passes.** Do NOT stop to ask the user for permission between cycles.
