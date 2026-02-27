@@ -28,7 +28,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "sync-templates": "rm -rf templates/cursor/agents templates/cursor/rules templates/cursor/skills && cp -r .cursor/agents .cursor/rules .cursor/skills templates/cursor/",
+    "sync-templates": "rm -rf templates/cursor/agents templates/cursor/rules templates/cursor/skills templates/cursor/commands && cp -r .cursor/agents .cursor/rules .cursor/skills .cursor/commands templates/cursor/",
     "prepublishOnly": "npm run sync-templates && npm run clean && npm run build"
   },
   "engines": {
