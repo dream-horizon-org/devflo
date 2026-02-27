@@ -1,7 +1,7 @@
 {
-  "name": "daisdlc",
+  "name": "@dream-horizon-org/daisdlc",
   "version": "0.1.0",
-  "description": "daisdlc — CLI and library",
+  "description": "AI Software Development Lifecycle — Cursor rules, agents, and skills delivered via CLI",
   "type": "module",
   "exports": {
     ".": {
@@ -15,18 +15,31 @@
     "daisdlc": "./dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dream-horizon-org/daisdlc.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build"
+    "sync-templates": "rm -rf templates/cursor/agents templates/cursor/rules templates/cursor/skills && cp -r .cursor/agents .cursor/rules .cursor/skills templates/cursor/",
+    "prepublishOnly": "npm run sync-templates && npm run clean && npm run build"
   },
   "engines": {
     "node": ">=20"
   },
   "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.0"
+  },
   "devDependencies": {
+    "@types/node": "^25.3.2",
     "typescript": "^5"
   }
 }

@@ -1,0 +1,18 @@
+---
+description: This rule must be applied before making any code change
+alwaysApply: true
+---
+
+- Always adhere to the DRY (Don’t Repeat Yourself) principle and write clean, well-structured code that follows standard best practices.
+
+- While coding, follow linting rules to minimize rework and ensure consistency.
+
+- After completing your code changes, run linting checks and resolve all issues before committing the code.
+
+- Ensure that the code is secure and production-ready.
+
+- For every new feature, always write appropriate unit and integration tests.
+
+- When modifying existing code, do not change the tests first. Update the code, run the existing tests to verify behavior, and only if tests fail, analyze the root cause and take the necessary corrective action.
+
+- Never let any file exceed 800 lines of code. If your changes cause a file to go beyond this limit, pause and reconsider the design — apply the Single Responsibility Principle to refactor and split the file into smaller, focused modules.
