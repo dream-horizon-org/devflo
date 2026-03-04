@@ -42,7 +42,7 @@ Invoke the **Developer Agent** (`dev-agent` subagent) with a prompt that include
 - Dependencies on other tasks (from `tasks.md`)
 - Instruction to read `design.md` for technical context
 - Instruction to read `proposal.md` for acceptance criteria context
-- Instruction to follow strict TDD: write tests first, then implement
+- Instruction to follow TDD per the Developer Agent's classification-aware policy (strict TDD for bugs/small changes; iterative TDD permitted for new feature interface discovery)
 - Instruction to update the task status in `tasks.md` to `done` when complete
 - Instruction to report any out-of-scope issues discovered during implementation
 

@@ -158,6 +158,23 @@ ARCH APPROVED
 → Change delivered
 ```
 
+### Bundled OpenSpec commands
+
+daisdlc bundles the [OpenSpec CLI](https://openspec.dev/) as a dependency. No separate installation is needed. All OpenSpec commands are available via `daisdlc spec`:
+
+```bash
+daisdlc spec init --tools none
+daisdlc spec change create <name>
+daisdlc spec change generate-templates <name>
+daisdlc spec change archive <name>
+daisdlc spec validate
+daisdlc spec status --json
+```
+
+Any OpenSpec command works — `daisdlc spec` forwards all arguments to the bundled OpenSpec binary.
+
+> **Migration note:** If you previously ran `openspec <cmd>` directly, replace it with `daisdlc spec <cmd>`.
+
 ### State management
 
 Commands persist state in `openspec/changes/<change-name>/status.yaml`, which tracks:
@@ -199,9 +216,11 @@ daisdlc/
 │   ├── cli.ts                  # CLI entry point (Commander)
 │   ├── commands/
 │   │   ├── init.ts             # daisdlc init
-│   │   └── update.ts           # daisdlc update
+│   │   ├── update.ts           # daisdlc update
+│   │   └── spec.ts             # daisdlc spec (OpenSpec passthrough)
 │   └── utils/
-│       └── copy.ts             # File copy and version marker utilities
+│       ├── copy.ts             # File copy and version marker utilities
+│       └── openspec.ts         # Bundled OpenSpec binary resolution and execution
 ├── .github/workflows/
 │   └── publish.yml             # Publishes to GitHub Packages on tag push
 └── package.json

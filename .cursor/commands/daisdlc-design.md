@@ -31,6 +31,7 @@ Invoke the **Architect Agent** (`architect-agent` subagent) with a prompt that i
 - Instruction to produce `design.md` and `tasks.md` in the change workspace
 - **MANDATORY instruction: The Architect MUST use the `AskQuestion` tool to ask the user at least one architectural or implementation approach question BEFORE writing the full design.** For New Feature and Major Refactor, the Architect must ask about key trade-offs (technology choices, data model decisions, API design alternatives). Skipping questions is only acceptable when the implementation has literally one possible approach with zero alternatives.
 - For **Small Change** classification: the Architect may produce a minimal design but must still validate its approach with the user via at least one confirmation question (unless the implementation has literally one possible approach)
+- **MANDATORY instruction: design.md must NOT contain implementation code, method bodies, pseudocode, or copy-pasteable code blocks.** Interfaces should be described in prose (method names, signatures, behavioral contracts) — not implemented.
 
 Wait for the Architect Agent to complete its work.
 

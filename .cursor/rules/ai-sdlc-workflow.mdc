@@ -131,6 +131,7 @@ Invoke the **PM Agent** (`pm-agent`). It must:
 - Create an OpenSpec change workspace.
 - Generate OpenSpec templates via CLI.
 - Populate proposal/requirements using a PM Brief.
+- The PM Agent must evaluate scope size and prefer tight, high-quality delivery over broad, shallow delivery. If the scope includes 3+ distinct capabilities, the PM should surface a scope reduction option to the user.
 
 **Stop after PM output and request approval.**
 
@@ -186,7 +187,7 @@ After Architect approval (or directly after Phase 0 for Trivial changes):
 
 1. **Auto-select tasks in dependency order.** Do NOT ask the user to choose a task. Read `tasks.md`, resolve the dependency graph, and start with tasks that have no pending dependencies. If multiple tasks are independent (no dependencies on each other), they may be executed in parallel or sequentially — use judgment based on whether they touch overlapping files.
 2. Invoke the **Developer Agent** (`dev-agent`) for each task.
-3. The Developer must use strict TDD (tests first, then implementation).
+3. The Developer must use TDD. Strict TDD (tests first) is the default. For New Feature tasks where the interface is being defined for the first time, iterative TDD (test alongside implementation) is permitted — see the Developer Agent instructions for the full policy. All acceptance behaviors must have passing tests before a task is marked complete.
 4. Update task status in OpenSpec on completion.
 5. After each task completes, immediately proceed to the next pending task (or to the QA phase if all tasks are done). **Do NOT pause to ask the user which task to do next.**
 

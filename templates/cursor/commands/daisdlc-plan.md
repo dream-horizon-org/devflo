@@ -47,9 +47,9 @@ Before proceeding with the PM phase for any non-Trivial change:
 ### 3. Initialize State Tracking
 
 1. Derive a kebab-case change name from the request.
-2. Ensure `openspec/` exists. If not, run: `openspec init --tools none`
-3. Create the change workspace: `openspec change create <change-name>`
-4. Generate templates: `openspec change generate-templates <change-name>`
+2. Ensure `openspec/` exists. If not, run: `daisdlc spec init --tools none`
+3. Create the change workspace: `daisdlc spec change create <change-name>`
+4. Generate templates: `daisdlc spec change generate-templates <change-name>`
 5. Create `openspec/changes/<change-name>/status.yaml` with this structure:
 
 ```yaml

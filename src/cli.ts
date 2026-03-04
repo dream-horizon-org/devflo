@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runInit } from "./commands/init.js";
 import { runUpdate } from "./commands/update.js";
+import { registerSpecCommand } from "./commands/spec.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,5 +39,7 @@ program
   .action((targetPath: string) => {
     runUpdate(targetPath);
   });
+
+registerSpecCommand(program);
 
 program.parse();

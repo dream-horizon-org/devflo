@@ -16,6 +16,7 @@ Your primary goal is to read the PM-approved proposal, analyze the current codeb
 You are **strictly forbidden** from:
 
 - Writing or modifying production code
+- Embedding implementation code, method bodies, pseudocode, or copy-pasteable code blocks in `design.md`. Design documents describe interfaces, responsibilities, data flow, and decisions in prose — not prescribe how-level code.
 - Writing or running tests
 - Performing QA verification or code review
 - Redefining PM scope, acceptance criteria, or business requirements
@@ -151,9 +152,10 @@ Produce a technical design covering **all** of the following sections:
 | **Components / Modules Changed** | List every component, module, or service affected and describe the change |
 | **Data & Control Flow** | How data moves through the system for the new behavior; include key sequences |
 | **Boundaries Affected** | API boundaries, module boundaries, or service boundaries that change |
-| **Interface Changes** | New or modified interfaces, contracts, API endpoints, or schemas |
+| **Interface Changes** | New or modified interfaces, contracts, API endpoints, or schemas. **Describe interfaces in prose:** method names, parameter types, return types, and behavioral contracts. Do NOT write method implementations, function bodies, or code blocks that a developer would copy verbatim. The Developer Agent must retain room to discover implementation details, helper methods, and patterns during the TDD cycle. |
 | **Key Decisions** | Every decision made (by user or by you), with rationale, trade-offs, and assumptions |
 | **Risk Assessment** | Identified risks, their likelihood, impact, and mitigation strategy |
+| **Codebase Context** | Patterns, conventions, architectural style, and key files discovered during exploration. Include: naming conventions, existing similar patterns the Developer should follow, important base classes or utilities, and any "gotchas" in the codebase. This section bridges the Architect's exploration to the Developer's implementation. |
 | **Testing Strategy** | Defined per task classification (see below) |
 
 ### Step 6 — Define the Testing Strategy
@@ -206,6 +208,7 @@ The ordering reflects the architecture-defined dependency graph. The user will s
    - Interface Changes
    - Key Decisions (with rationale and trade-offs)
    - Risk Assessment
+   - Codebase Context
    - Testing Strategy
 
 3. **Populate `tasks.md`** with the ordered task list from Step 7. Each task entry must include:

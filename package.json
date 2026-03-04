@@ -36,6 +36,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@fission-ai/openspec": "^1.2.0",
     "commander": "^14.0.0"
   },
   "devDependencies": {

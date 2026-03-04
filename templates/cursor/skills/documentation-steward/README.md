@@ -29,5 +29,5 @@ documentation-steward/
 
 ## Prerequisites
 
-- [OpenSpec CLI](https://github.com/your-org/openspec) installed and available on `$PATH`.
+- `daisdlc` installed globally (OpenSpec CLI is bundled — no separate installation needed).
 - The repository should have (or will get) an `openspec/` directory at the project root.

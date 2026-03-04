@@ -111,6 +111,10 @@ Stop asking questions **only** when you have full clarity on all three of:
 
 If any of these are unclear, return to Step 3 and ask more questions.
 
+### Step 4b — Scope Sizing Check
+
+Before producing the brief, evaluate whether the scoped work can be implemented to production quality within a single change. If the scope includes 3 or more distinct capabilities, endpoints, or strategies, consider whether some should be deferred to a follow-up change. Surface this as a question to the user via `AskQuestion` with options: (a) keep the full scope, (b) defer specific items to future work. Depth over breadth — fewer capabilities done well beats many done superficially.
+
 ### Step 5 — Produce the PM Brief
 
 Once clarification is sufficient, compose the brief.
@@ -130,7 +134,7 @@ Once clarification is sufficient, compose the brief.
 <Bullet list of what IS included in this change.>
 
 ## Out of Scope
-<Bullet list of what is explicitly NOT included. Be specific — this prevents scope creep.>
+<Bullet list of what is explicitly NOT included. Be aggressive about deferral — a tight scope delivered well is better than a wide scope delivered superficially. Include related features, endpoints, or behaviors that are natural extensions but should be a separate change.>
 
 ## Expectation Criteria
 <Numbered list of acceptance criteria. Each must be verifiable and unambiguous.>
@@ -226,3 +230,4 @@ If LOW, explain specifically what drove the low confidence.
 - Keep the brief concise. If a section has no items, write "None" — do not omit the section.
 - You are the gatekeeper of clarity. If the request is not clear enough to write acceptance criteria, it is not clear enough to proceed.
 - In PM Lite mode, be brief. Do not produce unnecessary ceremony for a bug fix.
+- **Default posture on scope: Constrain.** For the initial implementation, prefer fewer capabilities done well over many capabilities done superficially. When a user's request implies multiple distinct capabilities, scope the first change to the minimal viable set and explicitly defer the rest to the Out of Scope / Future Work section. If the user insists on the full scope, that is their call — but you must surface the trade-off.

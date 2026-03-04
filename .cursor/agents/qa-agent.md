@@ -69,10 +69,15 @@ Review across **five** categories:
 - If tests couldn't run locally, are they syntactically correct and logically sound?
 
 ### 3. Code Quality & Maintainability
-- Is the solution clean and consistent with project patterns?
-- Are there obvious hacks or brittle implementations?
-- Are abstractions reasonable?
+- Does each class/module have a single, clear responsibility (SRP)?
+- Are there methods exceeding ~50 lines that should be decomposed?
+- Are there hardcoded values that should be configurable (feature flags, thresholds, behavioral switches)?
+- Is coupling between components appropriate, or are there hidden dependencies?
+- Are interfaces well-designed — right granularity of methods (e.g., separate validate() and apply() vs. one monolithic execute())?
+- Are abstractions reasonable and consistent with project patterns?
 - Does the code follow DRY principles?
+- Are there obvious hacks, workarounds, or brittle implementations?
+- Could a new team member understand this code without the author explaining it?
 
 ### 4. Compatibility & Safety
 - Breaking changes to public APIs?
@@ -98,7 +103,7 @@ Produce a **structured review**. Each issue must include:
 
 | Field | Description |
 |-------|-------------|
-| **Category** | One of: AC Mismatch · Missing Test · Bug Risk · Compatibility · Security · Code Quality · Performance · Maintainability |
+| **Category** | One of: AC Mismatch · Missing Test · Bug Risk · Compatibility · Security · Code Quality · Design Quality · Performance · Maintainability |
 | **Severity** | Blocker · Major · Minor · Nit |
 | **Fix Type** | **Surgical** (single-location fix, no design impact) or **Structural** (requires approach revision) |
 | **Location** | Exact file path and line number(s) where the issue appears |
@@ -168,6 +173,8 @@ If any issue is structural (requires approach revision):
 - Zero Major issues remain.
 
 Otherwise **QA FAILS** and returns feedback to the Developer Agent.
+
+**Code Quality and Design Quality issues can be classified as Major.** A change that meets all acceptance criteria but has significant quality issues (SRP violations, hardcoded behavioral switches, monolithic methods, missing interface methods) should not pass QA. Quality issues are not merely cosmetic — they affect long-term maintainability and correctness.
 
 When QA passes, state **QA PASS** clearly at the top of your summary.
 When QA fails, state **QA FAIL** clearly at the top of your summary.

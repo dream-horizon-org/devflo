@@ -126,6 +126,7 @@ Invoke the **Architect Agent** (`architect-agent` subagent) with:
 - Instruction to read `proposal.md` for the approved PM Brief
 - Instruction to explore the codebase as needed
 - **MANDATORY instruction: The Architect MUST use the `AskQuestion` tool to ask the user at least one architectural or implementation approach question BEFORE writing the full design.** For New Feature and Major Refactor, the Architect must ask about key trade-offs (technology choices, data model decisions, API design alternatives). Skipping questions is only acceptable when the implementation has literally one possible approach with zero alternatives.
+- **MANDATORY instruction: design.md must NOT contain implementation code, method bodies, pseudocode, or copy-pasteable code blocks.** Interfaces should be described in prose (method names, signatures, behavioral contracts) — not implemented.
 - Instruction to produce `design.md` and `tasks.md` in the change workspace
 
 After the Architect Agent completes, update `status.yaml`:
@@ -166,7 +167,7 @@ If the user does not approve, wait. Do not proceed without explicit approval.
    - The specific task number, description, and done criteria from `tasks.md`
    - Instruction to read `design.md` for technical context
    - Instruction to read `proposal.md` for acceptance criteria
-   - Instruction to follow strict TDD: tests first, then implementation
+   - Instruction to follow TDD per the Developer Agent's classification-aware policy (strict TDD for bugs/small changes; iterative TDD permitted for new feature interface discovery)
    - Instruction to update task status in `tasks.md` to `done`
    - Instruction to report any out-of-scope issues discovered
 3. After the Developer Agent completes, update `status.yaml`:
