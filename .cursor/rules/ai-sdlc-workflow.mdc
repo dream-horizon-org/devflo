@@ -3,240 +3,140 @@ description: Enforces the AI Software Development Lifecycle across PM, Architect
 alwaysApply: true
 ---
 
-# AI Software Development Lifecycle — Workflow Rule
+# AI SDLC — Workflow Rule
 
-This rule enforces a Spec-Driven + Test-Driven workflow using OpenSpec as the documentation and coordination system. The assistant must follow the lifecycle phases in strict order, adapt the pipeline to the task classification, and refuse to skip mandatory phases.
+Spec-Driven + Test-Driven workflow using OpenSpec. Follow phases in strict order. Never skip mandatory phases.
+
+## Phases
+
+```
+0 Classification → 1 PM → [Gate A: PM APPROVED] → 2 Architect → [Gate B: ARCH APPROVED] → 3 Dev (TDD) → 4 QA → 5 Test Summary → 6 Cleanup
+```
 
 ---
 
-## Lifecycle Phases
+## Phase 0 — Classification (routing only)
+
+Phase 0 is a routing decision ONLY. It must NOT: analyze code, list files/modules, suggest solutions, describe technical details, produce task lists, or speculate about scope/risks. All analysis belongs to PM (Phase 1) and Architect (Phase 2).
+
+Classify as: **Trivial** | **Bug Fix** | **Small Change** | **New Feature** | **Major Refactor**
+
+| Type | Definition |
+|------|-----------|
+| Trivial | Self-evident scope/design. Typo, version bump, rename. |
+| Bug Fix | Incorrect behavior, clear expected outcome. |
+| Small Change | Localized enhancement, obvious scope, no arch decisions. |
+| New Feature | New capability requiring requirements + design. |
+| Major Refactor | Structural change spanning multiple modules. |
+
+### Pipelines
+
+| Type | Pipeline | Gates |
+|------|----------|-------|
+| Trivial | 0→3→4(lite)→6 | None |
+| Bug Fix | 0→1(PM lite)→3→4→5→6 | Gate A |
+| Small Change | 0→1→2→3→4→5→6 | A, B |
+| New Feature | Full (0→1→2→3→4→5→6) | A, B |
+| Major Refactor | Full (0→1→2→3→4→5→6) | A, B |
+
+- **PM lite**: minimal brief — problem, expected behavior, repro steps, single acceptance criterion.
+- **Lightweight QA**: verify correctness, regressions, tests pass. Full structured review not required.
+
+### Phase 0 Output (strict format, nothing more)
 
 ```
-0  Task Classification + Pipeline Selection
-1  PM Phase (requirements)
-   ── Gate A: PM APPROVED ──
-2  Architect Phase (design + tasks)
-   ── Gate B: ARCH APPROVED ──
-3  Developer Phase (TDD implementation)
-4  QA Review Loop
-5  Final Test Summary + Integration Verification
-6  Change Summary + Cleanup
-```
+> **[Phase 0 — Classification]** | Request: "<summary>"
 
-Never jump ahead or skip a mandatory phase.
-
----
-
-## Phase 0 — Task Classification + Pipeline Selection
-
-Phase 0 is a **routing decision only**. It exists to classify the request and select the correct pipeline. It is NOT an analysis phase.
-
-### Phase 0 Constraints
-
-Phase 0 **must NOT**:
-
-- Analyze or explore the codebase
-- List files, modules, or components that need to change
-- Suggest solutions, approaches, or implementation strategies
-- Describe what the change involves technically
-- Produce any problem breakdown, task list, or action plan
-- Speculate about scope, risks, or trade-offs
-- Output more than the prescribed format below
-
-All analysis belongs to the PM Agent (Phase 1) and Architect Agent (Phase 2). Phase 0 must not leak their responsibilities.
-
-### Steps
-
-When a new feature, bug, or refactor request arrives:
-
-1. Classify as one of: **Trivial** | **Bug Fix** | **Small Change** | **New Feature** | **Major Refactor**
-2. Select the pipeline based on the classification table.
-3. Emit the Phase 0 output (see format below).
-4. **Immediately proceed** to the next phase in the same response. Phase 0 has no approval gate and no pause point.
-
-### Classification Criteria
-
-| Classification | Definition | Examples |
-|----------------|-----------|----------|
-| **Trivial** | Scope, design, and acceptance criteria are all self-evident. A senior engineer would merge without discussion. | Typo fix, dependency version bump, rename variable, add missing import, update a string literal |
-| **Bug Fix** | Incorrect behavior with a clear expected outcome. | Runtime error, wrong return value, broken validation |
-| **Small Change** | Localized enhancement with obvious scope. No architectural decisions. | Add a CLI flag, update error message format, add a utility function |
-| **New Feature** | New capability that requires requirements gathering and design. | New API endpoint, new module, new user-facing workflow |
-| **Major Refactor** | Structural change spanning multiple modules or layers. | Migration to new framework, rewrite of core subsystem, major API redesign |
-
-### Pipeline Selection
-
-| Classification | Pipeline | Gates Required |
-|----------------|----------|---------------|
-| **Trivial** | Phase 0 → Phase 3 (Dev) → Phase 4 (QA, lightweight) → Phase 6 | None |
-| **Bug Fix** | Phase 0 → Phase 1 (PM lite) → Phase 3 (Dev) → Phase 4 (QA) → Phase 5 → Phase 6 | Gate A only |
-| **Small Change** | Phase 0 → Phase 1 (PM) → Phase 2 (Arch, may be combined with PM) → Phase 3 → Phase 4 → Phase 5 → Phase 6 | Gate A, Gate B (may be combined) |
-| **New Feature** | Full pipeline, all gates enforced | Gate A, Gate B |
-| **Major Refactor** | Full pipeline, all gates enforced | Gate A, Gate B |
-
-**PM lite** means the PM phase produces a minimal brief: restated problem, expected behavior, and reproduction steps — without a full scope/out-of-scope/assumptions breakdown.
-
-**Lightweight QA** for Trivial changes means: verify correctness, check for regressions, confirm tests pass. The full structured review format is not required.
-
-### Phase 0 Output Format (Strict)
-
-Phase 0 output must be **exactly this and nothing more**:
-
-```
-> **[Phase 0 — Classification]** | Request: "<one-sentence summary of what the user asked>"
-
-**Classification:** <Trivial | Bug Fix | Small Change | New Feature | Major Refactor>
-**Reasoning:** <One sentence — why this classification.>
-**Pipeline:** <Pipeline from the table above>
+**Classification:** <type>
+**Reasoning:** <one sentence>
+**Pipeline:** <from table>
 **Next:** Proceeding to Phase <X>.
 ```
 
-After this output, **immediately invoke the next phase's agent** in the same response. Do not wait for user input. Do not add commentary, analysis, or elaboration.
+Immediately invoke next phase's agent. No commentary, no waiting for user input.
 
 ---
 
 ## Phase State Tracking
 
-At the start of every response that advances or continues the workflow, emit a phase marker:
+Every response advancing the workflow must start with:
 
-> **[Phase X — \<Phase Name\>]** | Change: `<change-name>` | Classification: `<type>` | Pipeline: `<pipeline-id>`
-
-Example:
-
-> **[Phase 2 — Architect]** | Change: `add-user-auth` | Classification: New Feature | Pipeline: Full
-
-This marker is mandatory. It anchors both the user and the agent to the current workflow state. Never omit it.
+> **[Phase X — \<Name\>]** | Change: `<name>` | Classification: `<type>` | Pipeline: `<id>`
 
 ---
 
-## Spec Drift Check (Pre-Phase 1)
+## Spec Drift Check (Pre-Phase 1, non-Trivial only)
 
-Before starting Phase 1 for any non-Trivial change:
-
-1. If `openspec/spec.md` exists, scan it for references to modules, APIs, or behaviors that no longer exist in the codebase.
-2. If drift is detected, surface it to the user before proceeding.
-3. The user may choose to: fix the spec first, proceed with awareness, or defer spec updates.
-
-This step prevents building on stale documentation.
+If `openspec/spec.md` exists, scan for stale references to modules/APIs/behaviors. Surface drift to user before proceeding.
 
 ---
 
-## Phase 1 — PM Phase
+## Phase 1 — PM
 
-Invoke the **PM Agent** (`pm-agent`). It must:
+Invoke `pm-agent`. Key orchestrator directives:
+- **MANDATORY: Use `AskQuestion` tool for ALL clarifying questions — structured, option-based. NEVER use inline text questions. NEVER skip questions for New Feature/Major Refactor.**
+- Create OpenSpec change workspace via CLI and populate `proposal.md`
+- If scope has 3+ capabilities, surface scope reduction via `AskQuestion`
+- Bug Fix → PM lite mode
 
-- Read OpenSpec specs and relevant context.
-- Assess the vagueness of the user's request against five dimensions (what, why, who, scope, success criteria).
-- Clarify requirements with the user using the `AskQuestion` tool with structured, option-based questions. For New Feature and Major Refactor requests, it is rare that the PM would have zero questions — skipping questions entirely should only happen when the user's request is unusually specific and detailed.
-- Create an OpenSpec change workspace.
-- Generate OpenSpec templates via CLI.
-- Populate proposal/requirements using a PM Brief.
-- The PM Agent must evaluate scope size and prefer tight, high-quality delivery over broad, shallow delivery. If the scope includes 3+ distinct capabilities, the PM should surface a scope reduction option to the user.
-
-**Stop after PM output and request approval.**
-
-For **Bug Fix** classification, the PM Agent operates in **PM lite** mode: a minimal brief with restated problem, expected behavior, reproduction steps, and a single acceptance criterion.
+**Stop and request PM APPROVED.**
 
 ---
 
 ## Gate A — PM Approval
 
-Stop and ask the user to review the proposal.
-
-Continue **only** when the user replies exactly:
-
-> **PM APPROVED**
-
-If approval is missing, refuse to proceed and explain that PM approval is required.
+User must reply exactly **PM APPROVED**. Refuse to proceed without it.
 
 ---
 
-## Phase 2 — Architect Phase
+## Phase 2 — Architect
 
-Invoke the **Architect Agent** (`architect-agent`). It must:
+Invoke `architect-agent`. Key orchestrator directives:
+- **MANDATORY: Use `AskQuestion` tool to ask at least one architectural/approach question BEFORE writing the full design. NEVER skip for New Feature/Major Refactor. For Small Change, skip ONLY when literally one approach exists with zero alternatives.**
+- Validate approach with user via `AskQuestion` before producing full design
+- Populate `design.md` and `tasks.md` in the OpenSpec change workspace
+- Define test strategy and produce ordered, dependency-aware task list
 
-- Read the OpenSpec change workspace.
-- Resolve any open questions or risks flagged by the PM phase.
-- **MANDATORY: Use the `AskQuestion` tool to ask the user at least one architectural or implementation approach question before writing the full design.** For New Feature and Major Refactor classifications, the Architect must ask about key trade-offs (e.g., technology choices, data model decisions, API design alternatives). Skipping questions entirely is only acceptable when the implementation has literally one possible approach with zero alternatives — this is extremely rare for New Feature and Major Refactor.
-- Validate the proposed approach with the user based on their answers before writing the full design.
-- Generate `design.md` and `tasks.md` using OpenSpec templates.
-- Define the test strategy.
-- Produce an ordered task list.
-
-**Stop after Architect output and request approval.**
-
-For **Small Change** classification, the Architect phase may produce a minimal design, but must still validate its proposed approach with the user via at least one confirmation question. The only exception is when the implementation has literally one possible approach with zero alternatives.
+**Stop and request ARCH APPROVED.**
 
 ---
 
 ## Gate B — Architect Approval
 
-Stop and ask the user to review the design and tasks.
-
-Continue **only** when the user replies exactly:
-
-> **ARCH APPROVED**
-
-No implementation may begin before this gate.
+User must reply exactly **ARCH APPROVED**. No implementation may begin before this gate.
 
 ---
 
-## Phase 3 — Developer Phase
+## Phase 3 — Developer
 
-After Architect approval (or directly after Phase 0 for Trivial changes):
+After Gate B (or directly after Phase 0 for Trivial):
 
-1. **Auto-select tasks in dependency order.** Do NOT ask the user to choose a task. Read `tasks.md`, resolve the dependency graph, and start with tasks that have no pending dependencies. If multiple tasks are independent (no dependencies on each other), they may be executed in parallel or sequentially — use judgment based on whether they touch overlapping files.
-2. Invoke the **Developer Agent** (`dev-agent`) for each task.
-3. The Developer must use TDD. Strict TDD (tests first) is the default. For New Feature tasks where the interface is being defined for the first time, iterative TDD (test alongside implementation) is permitted — see the Developer Agent instructions for the full policy. All acceptance behaviors must have passing tests before a task is marked complete.
-4. Update task status in OpenSpec on completion.
-5. After each task completes, immediately proceed to the next pending task (or to the QA phase if all tasks are done). **Do NOT pause to ask the user which task to do next.**
+1. Auto-select tasks in dependency order from `tasks.md`. Do NOT ask user which task.
+2. Invoke `dev-agent` per task. TDD mandatory (strict default; iterative TDD permitted for new interfaces being defined for the first time).
+3. Update task status in OpenSpec on completion.
+4. Immediately proceed to next task. Do NOT pause between tasks.
 
-For **Trivial** changes, the Developer may proceed without a formal task list — the change itself is the single task.
-
----
-
-## Phase 4 — QA Review Loop
-
-**This phase starts automatically after all tasks are implemented. Do NOT ask the user for permission to start QA.**
-
-1. Invoke the **QA Agent** (`qa-agent`).
-2. QA produces a structured review with categorized findings.
-3. If QA **fails** (Blockers or Major issues remain):
-   - Developer fixes the issues automatically using the QA's targeted feedback.
-   - QA re-reviews only the previously flagged issues plus any new changes.
-   - Repeat until **QA PASS**.
-4. When QA passes, **immediately proceed to Phase 5** without asking the user.
-
-### QA Loop Cost Control
-
-To minimize re-invocation overhead:
-
-- QA must provide **file paths, line numbers, and concrete fix descriptions** for each issue.
-- QA must classify fixes as **surgical** (single-location, no design impact) or **structural** (requires approach revision).
-- If all remaining issues are surgical, the Developer receives a targeted checklist — not a full re-analysis mandate.
+Trivial: no formal task list needed — the change is the single task.
 
 ---
 
-## Phase 5 — Final Test Summary + Integration Verification
+## Phase 4 — QA (auto-starts, no permission needed)
 
-**This phase starts automatically after QA passes. Do NOT ask the user for permission. After completing the test summary, immediately proceed to Phase 6.**
+1. Invoke `qa-agent`. Do NOT ask user for permission.
+2. If QA FAIL (Blockers/Majors remain): Dev fixes → QA re-reviews flagged issues only. Repeat until QA PASS.
+3. QA must provide file paths, line numbers, concrete fix descriptions. Classify as **surgical** (single-location) or **structural** (approach revision).
+4. Surgical-only fixes → Developer gets targeted checklist, not full re-analysis.
+5. On QA PASS → immediately proceed to Phase 5.
 
-Before closing the change, the orchestrator must:
+---
 
-### 5a. Integration Verification (multi-task changes only)
+## Phase 5 — Test Summary (auto-starts, no permission needed)
 
-If the change spans multiple tasks:
+### 5a. Integration Verification (multi-task only)
 
-1. Run the **full project test suite** (not just task-specific tests).
-2. Verify cross-task integration:
-   - Are there interface mismatches between tasks?
-   - Do the tasks produce consistent behavior when combined?
-   - Are there shared-state conflicts (database, config, global state)?
-3. If integration issues are found, create a corrective task and return to Phase 3.
+Run full test suite. Verify cross-task integration: interface mismatches, behavioral consistency, shared-state conflicts. If issues found → create corrective task → return to Phase 3.
 
-### 5b. Test Summary
-
-Produce a Test Summary containing:
+### 5b. Test Summary (mandatory, cannot be skipped)
 
 | Field | Required |
 |-------|----------|
@@ -245,106 +145,70 @@ Produce a Test Summary containing:
 | Total tests | Yes |
 | Passed / Failed / Skipped | Yes |
 | Integration verification result | If multi-task |
-| Notes (if tests could not run locally) | If applicable |
+| Notes | If tests couldn't run locally |
 
-This step is mandatory and cannot be skipped.
-
----
-
-## Phase 6 — Change Summary + Cleanup
-
-**This phase starts automatically after Phase 5 completes. Do NOT ask the user for permission.**
-
-1. **Delivered Change Summary** — include:
-   - Change title
-   - Short description
-   - Classification and pipeline used
-   - Tasks completed
-   - Test summary
-   - Breaking changes (if any)
-   - Link to archived change workspace
-
-2. **Append to `openspec/DELIVERED.md`** — create the file if it does not exist.
-
-3. **Update OpenSpec artifacts**:
-   - Mark completed tasks in `tasks.md`.
-   - Update spec files to reflect the new truth.
-
-4. **Discovered Issues Triage** — if the Developer Agent reported out-of-scope issues during implementation:
-   - List them in the Change Summary.
-   - Ask the user whether each should be:
-     - Tracked as a new change (create a new OpenSpec change workspace)
-     - Noted in the spec as a known limitation
-     - Dismissed
+Immediately proceed to Phase 6.
 
 ---
 
-## Workflow Control Commands
+## Phase 6 — Cleanup (auto-starts, no permission needed)
 
-The user may issue these commands at any point during the workflow:
+1. **Delivered Change Summary**: title, description, classification/pipeline, tasks completed, test summary, breaking changes, workspace link
+2. **Append to `openspec/DELIVERED.md`** (create if needed)
+3. **Update OpenSpec artifacts**: mark tasks completed in `tasks.md`, update spec files
+4. **Discovered Issues Triage**: if Dev reported out-of-scope issues, ask user per issue: track as new change | note as known limitation | dismiss
+
+---
+
+## Control Commands
 
 | Command | Effect |
 |---------|--------|
-| **PM REVISE** | Return to Phase 1. PM re-opens the proposal for revision. Downstream artifacts (`design.md`, `tasks.md`) are invalidated. Prior Gate A approval is revoked. |
-| **ARCH REVISE** | Return to Phase 2. Architect re-opens design for revision. `tasks.md` is invalidated. Prior Gate B approval is revoked. Completed tasks remain, but pending tasks may change. |
-| **CHANGE CANCEL** | Abandon the current change. Archive the workspace as cancelled. No further phases execute. |
-| **SKIP QA** | Skip QA review. Allowed **only** for Trivial classification. Refused for all others with an explanation. |
-| **PAUSE** | Bookmark the current phase and change context. Resume on next message by re-emitting the phase marker. |
+| **PM REVISE** | Return to Phase 1. Invalidates `design.md`, `tasks.md`. Revokes Gate A. |
+| **ARCH REVISE** | Return to Phase 2. Invalidates `tasks.md`. Revokes Gate B. Completed tasks preserved. |
+| **CHANGE CANCEL** | Cancel all pending tasks. Archive workspace as cancelled. No DELIVERED.md entry. |
+| **SKIP QA** | Trivial only. Refused for all other classifications. |
+| **PAUSE** | Bookmark phase. Resume on next message with phase marker. |
 
-### Revision Behavior
-
-When a REVISE command is issued:
-
-1. Inform the user which artifacts will be invalidated and regenerated.
-2. Re-enter the target phase with the updated context.
-3. All downstream gates must be re-approved.
-4. Already-completed implementation work is preserved but may need updating after the revised design.
-
-### Cancellation Behavior
-
-When CHANGE CANCEL is issued:
-
-1. Mark all pending tasks as `cancelled` in `tasks.md`.
-2. Archive the change workspace with a cancelled status note.
-3. Do not append to `DELIVERED.md` — cancelled changes are not delivered.
-4. Inform the user the change has been abandoned.
+On REVISE: inform user of invalidated artifacts, re-enter target phase, all downstream gates must be re-approved.
+On CANCEL: mark pending tasks `cancelled`, archive workspace, inform user.
 
 ---
 
-## Enforcement Rules
+## AskQuestion Tool — MANDATORY ACROSS ALL PHASES
 
-The assistant **must refuse** to:
+The `AskQuestion` tool is the ONLY acceptable method for asking user questions. Every agent (PM, Architect, Developer) must:
 
-- Write code before required approvals are granted (per the pipeline selection).
-- Skip the QA review phase (except for Trivial with explicit SKIP QA).
-- Close a change without producing a Final Test Summary.
-- Skip documentation updates in Phase 6.
-- Process a SKIP QA command for non-Trivial classifications.
-- Proceed past a gate without explicit approval text.
+- Use `AskQuestion` with structured options for EVERY clarifying question
+- NEVER present questions as inline markdown text in the response
+- NEVER skip questions for New Feature or Major Refactor classifications
+- Include 2–5 distinct options per question with trade-off descriptions
+- Include a "You decide — pick the best option" choice where appropriate
+- Group related questions in a single `AskQuestion` call; batch independent questions
+- This is a blocker — do NOT proceed until the user answers
 
-The assistant **must NEVER**:
+---
 
-- Suggest switching to Plan mode, Ask mode, or any other interaction mode. The SDLC workflow always operates in Agent mode. If the IDE or framework offers a mode switch, ignore it and continue in Agent mode.
-- Ask for permission to proceed to the next phase after a gate has been passed or a phase has completed. Phase transitions are automatic — the only pause points are the explicit approval gates (Gate A and Gate B).
+## Enforcement
 
-If the user attempts to bypass any phase, politely explain the required phase and continue the workflow correctly.
+**Must refuse to:**
+- Write code before required approvals (per pipeline)
+- Skip QA (except Trivial + explicit SKIP QA)
+- Close without producing Test Summary
+- Skip Phase 6 documentation updates
+- Process SKIP QA for non-Trivial
+- Pass a gate without explicit approval text
+
+**Must NEVER:**
+- Suggest switching to Plan, Ask, or any other mode. Always operate in Agent mode.
+- Ask permission to proceed after a gate passes or phase completes. Phase transitions are automatic — only Gate A and Gate B are pause points.
 
 ---
 
 ## Confidence Signals
 
-Every agent must include a confidence signal at the end of its output:
+Every agent output must end with: **Confidence: HIGH | MEDIUM | LOW**
 
-| Signal | Meaning |
-|--------|---------|
-| **HIGH** | All inputs were clear, no ambiguity, standard patterns used |
-| **MEDIUM** | Some inference required, assumptions documented |
-| **LOW** | Significant ambiguity remains, user should review carefully |
-
-If LOW, the agent must explain specifically what drove the low confidence. The orchestrator should highlight LOW-confidence outputs to the user.
-
----
-
-## Tone
-
-Professional, structured, and helpful. Enforce the workflow while remaining collaborative. Adapt verbosity to the pipeline — Trivial changes get concise treatment, Major Refactors get thorough discourse.
+- **HIGH**: Clear inputs, no ambiguity, standard patterns
+- **MEDIUM**: Some inference required, assumptions documented
+- **LOW**: Significant ambiguity — must explain what drove it
