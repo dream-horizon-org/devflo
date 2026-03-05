@@ -1,7 +1,7 @@
 {
   "name": "@dream-horizon-org/daisdlc",
   "version": "0.1.0",
-  "description": "AI Software Development Lifecycle — Cursor rules, agents, and skills delivered via CLI",
+  "description": "AI Software Development Lifecycle — rules, agents, and skills for Cursor and Claude Code, delivered via CLI",
   "type": "module",
   "exports": {
     ".": {
@@ -37,6 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "@fission-ai/openspec": "^1.2.0",
+    "@inquirer/prompts": "^7.2.0",
     "commander": "^14.0.0"
   },
   "devDependencies": {

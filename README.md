@@ -1,15 +1,22 @@
 # daisdlc
 
-AI Software Development Lifecycle for [Cursor](https://cursor.com). Installs a complete set of rules, agents, commands, and skills into any project's `.cursor/` directory via a single CLI command.
+AI Software Development Lifecycle for [Cursor](https://cursor.com) and [Claude Code](https://docs.claude.com/en/docs/claude-code). Installs a complete set of rules, agents, commands, and skills into any project via a single CLI command.
 
 ## What's Included
 
 | Category | Files | Purpose |
 |----------|-------|---------|
-| **Rules** | `ai-sdlc-workflow.mdc`, `must-follow.mdc` | Enforces the full SDLC lifecycle with approval gates, and coding standards (DRY, linting, test-first, 800-line limit) |
+| **Rules** | `ai-sdlc-workflow.mdc` / `CLAUDE.md`, `must-follow.mdc` | Enforces the full SDLC lifecycle with approval gates, and coding standards (DRY, linting, test-first, 800-line limit) |
 | **Agents** | `pm-agent.md`, `architect-agent.md`, `dev-agent.md`, `qa-agent.md` | Specialized agents for Product Management, Architecture, Development (TDD), and QA Review |
 | **Commands** | `daisdlc.md`, `daisdlc-plan.md`, `daisdlc-design.md`, etc. | Slash commands for driving individual SDLC phases or the full lifecycle explicitly |
 | **Skills** | `documentation-steward`, `reuse-before-write` | Automates OpenSpec documentation lifecycle and enforces reuse-first development |
+
+## Supported Tools
+
+| Tool | Target | Destination |
+|------|--------|-------------|
+| **Cursor IDE** | `cursor` | `.cursor/` directory (rules, agents, commands, skills) |
+| **Claude Code** | `claude-code` | `.claude/` directory (agents, commands, skills) + `CLAUDE.md` at project root |
 
 ## Prerequisites
 
@@ -45,12 +52,27 @@ Navigate to your project directory and run:
 daisdlc init
 ```
 
-This copies all SDLC rules, agents, commands, and skills into your project's `.cursor/` directory.
+You'll see an interactive prompt to select your AI coding tool:
+
+```
+? Select your AI coding tool: (Use arrow keys)
+❯ Cursor IDE
+  Claude Code
+```
+
+Cursor is selected by default. Press Enter to accept, or arrow down to pick Claude Code.
+
+You can also skip the prompt with the `--target` flag:
+
+```bash
+daisdlc init --target cursor
+daisdlc init --target claude-code
+```
 
 You can also specify a path:
 
 ```bash
-daisdlc init ./path/to/project
+daisdlc init ./path/to/project --target claude-code
 ```
 
 ### Update to the latest version
@@ -62,14 +84,16 @@ npm update -g @dream-horizon-org/daisdlc
 daisdlc update
 ```
 
-The `update` command checks the installed version against the package version and only copies files if there's a newer version available.
+The `update` command auto-detects which target was previously installed (from the version marker) and updates accordingly. You can override with `--target` if needed.
 
 ## What happens when you run `daisdlc init`
+
+### Cursor IDE (`--target cursor`)
 
 ```
 your-project/
 └── .cursor/
-    ├── .daisdlc              # Version marker (tracks installed version)
+    ├── .daisdlc              # Version marker (tracks installed version + target)
     ├── agents/
     │   ├── architect-agent.md
     │   ├── dev-agent.md
@@ -94,15 +118,43 @@ your-project/
             └── SKILL.md
 ```
 
-Existing files in `.cursor/` that don't conflict with daisdlc files are left untouched. Files with the same name are overwritten.
+### Claude Code (`--target claude-code`)
+
+```
+your-project/
+├── CLAUDE.md                 # SDLC workflow rules + coding standards (always loaded)
+└── .claude/
+    ├── .daisdlc              # Version marker (tracks installed version + target)
+    ├── agents/
+    │   ├── architect-agent.md
+    │   ├── dev-agent.md
+    │   ├── pm-agent.md
+    │   └── qa-agent.md
+    ├── commands/
+    │   ├── daisdlc.md
+    │   ├── daisdlc-plan.md
+    │   ├── daisdlc-design.md
+    │   ├── daisdlc-implement.md
+    │   ├── daisdlc-audit.md
+    │   ├── daisdlc-status.md
+    │   └── daisdlc-deliver.md
+    └── skills/
+        ├── documentation-steward/
+        │   ├── README.md
+        │   └── SKILL.md
+        └── reuse-before-write/
+            └── SKILL.md
+```
+
+Existing files in `.cursor/` or `.claude/` that don't conflict with daisdlc files are left untouched. Files with the same name are overwritten.
 
 ## Commands
 
-daisdlc installs Cursor slash commands that let you drive the SDLC pipeline explicitly. Type `/` in the Cursor chat input to see all available commands.
+daisdlc installs slash commands that let you drive the SDLC pipeline explicitly. In Cursor, type `/` in the chat input. In Claude Code, type `/` at the prompt.
 
 ### Two ways to use the SDLC
 
-1. **Automatic (rule-based):** Just describe your request in chat. The `ai-sdlc-workflow.mdc` rule automatically classifies it, selects the pipeline, and orchestrates phases in sequence with approval gates.
+1. **Automatic (rule-based):** Just describe your request in chat. The workflow rule automatically classifies it, selects the pipeline, and orchestrates phases in sequence with approval gates.
 
 2. **Manual (command-driven):** Use the `/daisdlc-*` commands to invoke each phase yourself. This gives you full control over when each phase runs, and works across chat sessions since state is persisted in `status.yaml` inside the OpenSpec change workspace.
 
@@ -197,6 +249,7 @@ npm install -g @dream-horizon-org/daisdlc
 # In any project
 cd your-project
 daisdlc init
+# Select "Cursor IDE" or "Claude Code" when prompted
 ```
 
 ## Contributing
@@ -207,19 +260,24 @@ daisdlc init
 daisdlc/
 ├── .cursor/                    # This repo's own Cursor config (used during development)
 ├── templates/
-│   └── cursor/                 # Distributable assets (shipped in the npm package)
+│   ├── cursor/                 # Distributable assets for Cursor IDE
+│   │   ├── agents/
+│   │   ├── commands/
+│   │   ├── rules/
+│   │   └── skills/
+│   └── claude-code/            # Distributable assets for Claude Code
+│       ├── CLAUDE.md
 │       ├── agents/
 │       ├── commands/
-│       ├── rules/
 │       └── skills/
 ├── src/
 │   ├── cli.ts                  # CLI entry point (Commander)
 │   ├── commands/
-│   │   ├── init.ts             # daisdlc init
-│   │   ├── update.ts           # daisdlc update
+│   │   ├── init.ts             # daisdlc init (with interactive target prompt)
+│   │   ├── update.ts           # daisdlc update (auto-detects target)
 │   │   └── spec.ts             # daisdlc spec (OpenSpec passthrough)
 │   └── utils/
-│       ├── copy.ts             # File copy and version marker utilities
+│       ├── copy.ts             # Target-aware file copy and version marker utilities
 │       └── openspec.ts         # Bundled OpenSpec binary resolution and execution
 ├── .github/workflows/
 │   └── publish.yml             # Publishes to GitHub Packages on tag push
@@ -237,13 +295,15 @@ npm run build
 
 ### Editing Rules, Agents, Commands, or Skills
 
-The canonical source for SDLC content lives in `.cursor/` at the project root. Edit files there, then sync them to `templates/cursor/` before publishing:
+**Cursor templates:** The canonical source lives in `.cursor/` at the project root. Edit files there, then sync them to `templates/cursor/` before publishing:
 
 ```bash
 npm run sync-templates
 ```
 
-This is also run automatically as part of `prepublishOnly`, so you don't need to remember it when publishing.
+This is also run automatically as part of `prepublishOnly`.
+
+**Claude Code templates:** Maintained directly in `templates/claude-code/`. Edit those files in place.
 
 ### Building
 

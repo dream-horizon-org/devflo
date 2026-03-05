@@ -20,24 +20,26 @@ const program = new Command();
 program
   .name("daisdlc")
   .description(
-    "AI Software Development Lifecycle — install Cursor rules, agents, and skills into your project",
+    "AI Software Development Lifecycle — install rules, agents, and skills for Cursor or Claude Code",
   )
   .version(pkg.version);
 
 program
   .command("init")
-  .description("Initialize AI SDLC in your project (copies .cursor files)")
+  .description("Initialize AI SDLC in your project")
   .argument("[path]", "target project directory", process.cwd())
-  .action((targetPath: string) => {
-    runInit(targetPath);
+  .option("-t, --target <target>", "target IDE: cursor or claude-code (skips interactive prompt)")
+  .action(async (targetPath: string, opts: { target?: string }) => {
+    await runInit(targetPath, opts.target);
   });
 
 program
   .command("update")
   .description("Update AI SDLC files to the latest version")
   .argument("[path]", "target project directory", process.cwd())
-  .action((targetPath: string) => {
-    runUpdate(targetPath);
+  .option("-t, --target <target>", "target IDE: cursor or claude-code (overrides auto-detect)")
+  .action(async (targetPath: string, opts: { target?: string }) => {
+    await runUpdate(targetPath, opts.target);
   });
 
 registerSpecCommand(program);

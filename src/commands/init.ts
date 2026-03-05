@@ -1,16 +1,38 @@
 import { resolve } from "node:path";
 import { existsSync } from "node:fs";
+import { select } from "@inquirer/prompts";
 import {
+  type Target,
   getTemplatesDir,
   getPackageVersion,
   readVersionMarker,
   writeVersionMarker,
   copyTemplates,
+  destLabel,
 } from "../utils/copy.js";
 
-export function runInit(targetPath?: string): void {
-  const target = resolve(targetPath ?? process.cwd());
-  const templatesDir = getTemplatesDir();
+async function resolveTarget(preselected?: string): Promise<Target> {
+  if (preselected === "cursor" || preselected === "claude-code") return preselected;
+
+  if (preselected) {
+    console.error(`Invalid target "${preselected}". Must be "cursor" or "claude-code".`);
+    process.exit(1);
+  }
+
+  return select<Target>({
+    message: "Select your AI coding tool:",
+    choices: [
+      { name: "Cursor IDE", value: "cursor" },
+      { name: "Claude Code", value: "claude-code" },
+    ],
+    default: "cursor",
+  });
+}
+
+export async function runInit(targetPath?: string, preselectedTarget?: string): Promise<void> {
+  const projectDir = resolve(targetPath ?? process.cwd());
+  const target = await resolveTarget(preselectedTarget);
+  const templatesDir = getTemplatesDir(target);
 
   if (!existsSync(templatesDir)) {
     console.error("Error: templates directory not found at", templatesDir);
@@ -19,24 +41,26 @@ export function runInit(targetPath?: string): void {
   }
 
   const version = getPackageVersion();
-  const existing = readVersionMarker(target);
+  const existing = readVersionMarker(projectDir, target);
 
   if (existing) {
-    console.log(`Existing daisdlc installation detected (v${existing.version}).`);
+    console.log(`Existing daisdlc installation detected (v${existing.version}, target: ${existing.target}).`);
     console.log("Files will be overwritten with the current version.\n");
   }
 
-  console.log(`Initializing daisdlc v${version} in ${target}\n`);
+  console.log(`Initializing daisdlc v${version} for ${target} in ${projectDir}\n`);
 
-  const copied = copyTemplates(templatesDir, target);
-  writeVersionMarker(target, version);
+  const copied = copyTemplates(templatesDir, projectDir, target);
+  writeVersionMarker(projectDir, target, version);
 
-  console.log(`Copied ${copied.length} files into .cursor/:\n`);
+  const label = destLabel(target);
+  console.log(`Copied ${copied.length} files into ${label}:\n`);
   for (const file of copied) {
-    const relative = file.replace(target + "/", "");
+    const relative = file.replace(projectDir + "/", "");
     console.log(`  ${relative}`);
   }
 
-  console.log(`\nVersion marker written to .cursor/.daisdlc`);
+  const markerLoc = target === "cursor" ? ".cursor/.daisdlc" : ".claude/.daisdlc";
+  console.log(`\nVersion marker written to ${markerLoc}`);
   console.log("\nDone! Your project is set up with the AI SDLC workflow.");
 }

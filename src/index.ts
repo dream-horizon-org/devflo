@@ -4,6 +4,8 @@ export {
   readVersionMarker,
   writeVersionMarker,
   copyTemplates,
+  detectTarget,
+  destLabel,
 } from "./utils/copy.js";
 
-export type { VersionMarker } from "./utils/copy.js";
+export type { VersionMarker, Target } from "./utils/copy.js";
