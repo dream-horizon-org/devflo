@@ -31,13 +31,13 @@ Progress:
 Check for the `openspec/` directory at the project root. If it does not exist:
 
 ```bash
-daisdlc spec init --tools none
+devflo spec init --tools none
 ```
 
 **2. Create the change workspace.**
 
 ```bash
-daisdlc spec change create <change-name>
+devflo spec change create <change-name>
 ```
 
 Replace `<change-name>` with a kebab-case identifier for the change (e.g. `add-user-auth`).
@@ -45,7 +45,7 @@ Replace `<change-name>` with a kebab-case identifier for the change (e.g. `add-u
 **3. Generate templates.**
 
 ```bash
-daisdlc spec change generate-templates <change-name>
+devflo spec change generate-templates <change-name>
 ```
 
 **4. Verify the workspace contains the required files:**
@@ -80,13 +80,13 @@ Progress:
 **1. Run OpenSpec validation.**
 
 ```bash
-daisdlc spec validate
+devflo spec validate
 ```
 
 **2. Collect structured status** (if the command is available):
 
 ```bash
-daisdlc spec status --json
+devflo spec status --json
 ```
 
 **3. Summarize results.** Report:
@@ -180,7 +180,7 @@ Progress:
 **2. Run final validation.**
 
 ```bash
-daisdlc spec validate
+devflo spec validate
 ```
 
 Resolve any errors before proceeding.
@@ -205,7 +205,7 @@ Resolve any errors before proceeding.
 **5. Archive the change workspace.**
 
 ```bash
-daisdlc spec change archive <change-name>
+devflo spec change archive <change-name>
 ```
 
 **6. Output a confirmation summary** including: change name, archive status, and a reminder to update any related spec files to reflect the new state.
@@ -241,7 +241,7 @@ Progress:
 **3. Archive the change workspace** with a cancelled status:
 
 ```bash
-daisdlc spec change archive <change-name>
+devflo spec change archive <change-name>
 ```
 
 **4. Do not append to `DELIVERED.md`** — cancelled changes are not delivered.

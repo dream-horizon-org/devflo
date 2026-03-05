@@ -5,7 +5,7 @@ export function registerSpecCommand(program: Command): void {
   program
     .command("spec")
     .description(
-      "Run bundled OpenSpec CLI commands (passthrough). Usage: daisdlc spec <openspec-args...>",
+      "Run bundled OpenSpec CLI commands (passthrough). Usage: devflo spec <openspec-args...>",
     )
     .allowUnknownOption()
     .allowExcessArguments()
@@ -14,16 +14,16 @@ export function registerSpecCommand(program: Command): void {
       const args = cmd.args;
       if (args.length === 0) {
         console.log(
-          "Usage: daisdlc spec <command> [options]\n\n" +
+          "Usage: devflo spec <command> [options]\n\n" +
             "Forwards all arguments to the bundled OpenSpec CLI.\n\n" +
             "Examples:\n" +
-            "  daisdlc spec init --tools none\n" +
-            "  daisdlc spec change create <name>\n" +
-            "  daisdlc spec change generate-templates <name>\n" +
-            "  daisdlc spec validate\n" +
-            "  daisdlc spec status --json\n" +
-            "  daisdlc spec change archive <name>\n\n" +
-            "Run 'daisdlc spec --help' to see all available OpenSpec commands.",
+            "  devflo spec init --tools none\n" +
+            "  devflo spec change create <name>\n" +
+            "  devflo spec change generate-templates <name>\n" +
+            "  devflo spec validate\n" +
+            "  devflo spec status --json\n" +
+            "  devflo spec change archive <name>\n\n" +
+            "Run 'devflo spec --help' to see all available OpenSpec commands.",
         );
         return;
       }

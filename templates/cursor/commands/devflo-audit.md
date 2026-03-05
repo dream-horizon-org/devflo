@@ -1,12 +1,6 @@
----
-description: Run QA review on completed tasks for a change
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
-argument-hint: change-name
----
-
 # Audit — Quality Review
 
-You are the orchestrator for the audit phase of the AI SDLC. The user will provide the change name as a parameter (e.g., `/daisdlc-audit add-user-auth`).
+You are the orchestrator for the audit phase of the AI SDLC. The user will provide the change name as a parameter (e.g., `/devflo-audit add-user-auth`).
 
 ## Steps
 
@@ -18,7 +12,7 @@ You are the orchestrator for the audit phase of the AI SDLC. The user will provi
 
 If prerequisites fail:
 
-- Suggest: "Run `/daisdlc-implement <change-name> <task>` to complete at least one task first."
+- Suggest: "Run `/devflo-implement <change-name> <task>` to complete at least one task first."
 - Explain what's missing and **stop — do not proceed**.
 
 ### 2. Determine QA Mode
@@ -34,7 +28,7 @@ Update `phases.qa.status` in `status.yaml` to `in_progress`.
 
 ### 4. Invoke the QA Agent
 
-Invoke the **QA Agent** (`qa-agent` agent) with a prompt that includes:
+Invoke the **QA Agent** (`qa-agent` subagent) with a prompt that includes:
 
 - The change name and workspace path: `openspec/changes/<change-name>/`
 - The classification and QA mode (lightweight vs full)
@@ -55,7 +49,7 @@ Wait for the QA Agent to complete its work.
 
 Update `phases.qa.status` in `status.yaml` to `pass`.
 
-**Immediately proceed to the Deliver phase** — invoke `/daisdlc-deliver <change-name>` behavior (test summary, change summary, cleanup). Do NOT stop to ask the user for permission.
+**Immediately proceed to the Deliver phase** — invoke `/devflo-deliver <change-name>` behavior (test summary, change summary, cleanup). Do NOT stop to ask the user for permission.
 
 **If QA fails** (Blockers or Major issues remain):
 

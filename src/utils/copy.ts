@@ -32,8 +32,8 @@ export function getPackageVersion(): string {
  * Returns null if no marker exists in either location.
  */
 export function detectTarget(targetDir: string): Target | null {
-  const cursorMarker = join(targetDir, ".cursor", ".daisdlc");
-  const claudeMarker = join(targetDir, ".claude", ".daisdlc");
+  const cursorMarker = join(targetDir, ".cursor", ".devflo");
+  const claudeMarker = join(targetDir, ".claude", ".devflo");
 
   for (const [path, fallback] of [[cursorMarker, "cursor"], [claudeMarker, "claude-code"]] as const) {
     if (existsSync(path)) {
@@ -52,8 +52,8 @@ export function detectTarget(targetDir: string): Target | null {
 
 function markerPath(targetDir: string, target: Target): string {
   return target === "cursor"
-    ? join(targetDir, ".cursor", ".daisdlc")
-    : join(targetDir, ".claude", ".daisdlc");
+    ? join(targetDir, ".cursor", ".devflo")
+    : join(targetDir, ".claude", ".devflo");
 }
 
 export function readVersionMarker(targetDir: string, target: Target): VersionMarker | null {

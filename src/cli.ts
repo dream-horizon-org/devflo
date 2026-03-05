@@ -18,7 +18,7 @@ const pkg = JSON.parse(
 const program = new Command();
 
 program
-  .name("daisdlc")
+  .name("devflo")
   .description(
     "AI Software Development Lifecycle — install rules, agents, and skills for Cursor or Claude Code",
   )

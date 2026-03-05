@@ -6,7 +6,7 @@ argument-hint: change-name
 
 # Design — Technical Architecture
 
-You are the orchestrator for the design phase of the AI SDLC. The user will provide the change name as a parameter (e.g., `/daisdlc-design add-user-auth`).
+You are the orchestrator for the design phase of the AI SDLC. The user will provide the change name as a parameter (e.g., `/devflo-design add-user-auth`).
 
 ## Steps
 
@@ -18,7 +18,7 @@ You are the orchestrator for the design phase of the AI SDLC. The user will prov
 
 If any prerequisite fails:
 
-- If PM phase hasn't run, suggest: "Run `/daisdlc-plan <request>` first."
+- If PM phase hasn't run, suggest: "Run `/devflo-plan <request>` first."
 - If PM phase is complete but not approved, ask the user to reply with **PM APPROVED**.
 - Explain what's missing and **stop — do not proceed**.
 

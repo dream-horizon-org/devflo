@@ -1,6 +1,12 @@
+---
+description: Implement tasks using TDD via the Developer Agent
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+argument-hint: change-name [task-number]
+---
+
 # Implement — Build with TDD
 
-You are the orchestrator for the implementation phase of the AI SDLC. The user will provide the change name and optionally a task number as parameters (e.g., `/daisdlc-implement add-user-auth 1` or `/daisdlc-implement add-user-auth`).
+You are the orchestrator for the implementation phase of the AI SDLC. The user will provide the change name and optionally a task number as parameters (e.g., `/devflo-implement add-user-auth 1` or `/devflo-implement add-user-auth`).
 
 ## Steps
 
@@ -14,7 +20,7 @@ You are the orchestrator for the implementation phase of the AI SDLC. The user w
 
 If any prerequisite fails:
 
-- If Architect phase hasn't run, suggest: "Run `/daisdlc-design <change-name>` first."
+- If Architect phase hasn't run, suggest: "Run `/devflo-design <change-name>` first."
 - If Architect phase is complete but not approved, ask the user to reply with **ARCH APPROVED**.
 - Explain what's missing and **stop — do not proceed**.
 
@@ -34,7 +40,7 @@ Update `status.yaml` to set `phases.developer.current_task` to the selected task
 
 ### 4. Invoke the Developer Agent
 
-Invoke the **Developer Agent** (`dev-agent` subagent) with a prompt that includes:
+Invoke the **Developer Agent** (`dev-agent` agent) with a prompt that includes:
 
 - The change name and workspace path: `openspec/changes/<change-name>/`
 - The specific task number and its full description from `tasks.md`
@@ -58,6 +64,6 @@ After the Developer Agent finishes, update `status.yaml`:
 ### 6. Next Steps — Automatic Advancement
 
 - If more tasks remain: **Immediately loop back to Step 2** and auto-select the next task(s) in dependency order. Do NOT stop to ask the user.
-- If all tasks are done: **Immediately proceed to the Audit phase** — invoke `/daisdlc-audit <change-name>` behavior (validate prerequisites, invoke QA Agent).
+- If all tasks are done: **Immediately proceed to the Audit phase** — invoke `/devflo-audit <change-name>` behavior (validate prerequisites, invoke QA Agent).
 
 **Do NOT stop and ask for permission. Phase transitions are automatic.**

@@ -1,6 +1,6 @@
 # Run Full AI SDLC
 
-You are the orchestrator for the complete AI Software Development Lifecycle. The user will provide a request description as a parameter (e.g., `/daisdlc Add user authentication with OAuth2`).
+You are the orchestrator for the complete AI Software Development Lifecycle. The user will provide a request description as a parameter (e.g., `/devflo Add user authentication with OAuth2`).
 
 This command drives the full lifecycle from classification through delivery — the same pipeline defined in the AI SDLC workflow rule, enforced explicitly as a command.
 
@@ -52,9 +52,9 @@ If `openspec/spec.md` exists, scan it for references to modules, APIs, or behavi
 ## Initialize OpenSpec Change Workspace
 
 1. Derive a kebab-case change name from the request.
-2. Ensure `openspec/` exists. If not, run: `openspec init --tools none`
-3. Create the change workspace: `openspec change create <change-name>`
-4. Generate templates: `openspec change generate-templates <change-name>`
+2. Ensure `openspec/` exists. If not, run: `devflo spec init --tools none`
+3. Create the change workspace: `devflo spec change create <change-name>`
+4. Generate templates: `devflo spec change generate-templates <change-name>`
 5. Create `openspec/changes/<change-name>/status.yaml`:
 
 ```yaml

@@ -1,6 +1,6 @@
 # Deliver — Test Summary + Finalize
 
-Finalize and deliver an AI SDLC change. The user will provide the change name as a parameter (e.g., `/daisdlc-deliver add-user-auth`).
+Finalize and deliver an AI SDLC change. The user will provide the change name as a parameter (e.g., `/devflo-deliver add-user-auth`).
 
 ## Steps
 
@@ -11,7 +11,7 @@ Finalize and deliver an AI SDLC change. The user will provide the change name as
 
 If prerequisites fail:
 
-- If QA hasn't passed, suggest: "Run `/daisdlc-audit <change-name>` first."
+- If QA hasn't passed, suggest: "Run `/devflo-audit <change-name>` first."
 - Explain what's missing and **stop — do not proceed**.
 
 ### 2. Phase 5 — Final Test Summary + Integration Verification
@@ -25,7 +25,7 @@ If `phases.developer.tasks_completed` has more than one task:
    - Are there interface mismatches between tasks?
    - Do the tasks produce consistent behavior when combined?
    - Are there shared-state conflicts (database, config, global state)?
-3. If integration issues are found, report them and suggest running `/daisdlc-implement <change-name>` to create a corrective task. **Stop — do not proceed.**
+3. If integration issues are found, report them and suggest running `/devflo-implement <change-name>` to create a corrective task. **Stop — do not proceed.**
 
 #### 2b. Test Summary
 
@@ -87,7 +87,7 @@ phases:
 5. **Discovered Issues Triage** — if the Developer Agent reported any out-of-scope issues during implementation:
    - List each issue.
    - Ask the user whether each should be:
-     - Tracked as a new change (suggest running `/daisdlc-plan <issue description>`)
+     - Tracked as a new change (suggest running `/devflo-plan <issue description>`)
      - Noted in the spec as a known limitation
      - Dismissed
 

@@ -47,9 +47,9 @@ Before proceeding with the PM phase for any non-Trivial change:
 ### 3. Initialize State Tracking
 
 1. Derive a kebab-case change name from the request.
-2. Ensure `openspec/` exists. If not, run: `daisdlc spec init --tools none`
-3. Create the change workspace: `daisdlc spec change create <change-name>`
-4. Generate templates: `daisdlc spec change generate-templates <change-name>`
+2. Ensure `openspec/` exists. If not, run: `devflo spec init --tools none`
+3. Create the change workspace: `devflo spec change create <change-name>`
+4. Generate templates: `devflo spec change generate-templates <change-name>`
 5. Create `openspec/changes/<change-name>/status.yaml` with this structure:
 
 ```yaml
@@ -103,6 +103,6 @@ phases:
     approved_at: <current ISO date>
 ```
 
-Confirm approval and tell the user they can now run `/daisdlc-design <change-name>` when ready to proceed to the Design phase.
+Confirm approval and tell the user they can now run `/devflo-design <change-name>` when ready to proceed to the Design phase.
 
 **Do NOT auto-advance to the Design phase. Stop here.**

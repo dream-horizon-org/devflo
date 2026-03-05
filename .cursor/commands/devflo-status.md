@@ -1,6 +1,6 @@
 # Status — Check Change Progress
 
-Report the current status of an AI SDLC change. The user may provide a change name as a parameter (e.g., `/daisdlc-status add-user-auth`). If no parameter is provided, list all changes.
+Report the current status of an AI SDLC change. The user may provide a change name as a parameter (e.g., `/devflo-status add-user-auth`). If no parameter is provided, list all changes.
 
 ## For a Specific Change
 
@@ -23,9 +23,9 @@ Phase Status:
 ```
 
 3. Based on the current state, suggest the **next command** the user should run. For example:
-   - If Plan is `complete` but not `approved`: "Reply with **PM APPROVED**, then run `/daisdlc-design <change-name>`."
-   - If Design is `approved`: "Run `/daisdlc-implement <change-name> <next-pending-task>` to start implementation."
-   - If Audit is `pass`: "Run `/daisdlc-deliver <change-name>` to finalize."
+   - If Plan is `complete` but not `approved`: "Reply with **PM APPROVED**, then run `/devflo-design <change-name>`."
+   - If Design is `approved`: "Run `/devflo-implement <change-name> <next-pending-task>` to start implementation."
+   - If Audit is `pass`: "Run `/devflo-deliver <change-name>` to finalize."
 
 ## For All Changes
 
@@ -38,4 +38,4 @@ If no change name is provided:
 <change-name>  |  <classification>  |  Current phase: <phase>  |  <status>
 ```
 
-3. If no changes exist, tell the user: "No active changes found. Run `/daisdlc-plan <request>` to start a new change."
+3. If no changes exist, tell the user: "No active changes found. Run `/devflo-plan <request>` to start a new change."

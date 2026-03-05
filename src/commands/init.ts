@@ -36,7 +36,7 @@ export async function runInit(targetPath?: string, preselectedTarget?: string): 
 
   if (!existsSync(templatesDir)) {
     console.error("Error: templates directory not found at", templatesDir);
-    console.error("This is likely a packaging issue. Please reinstall daisdlc.");
+    console.error("This is likely a packaging issue. Please reinstall devflo.");
     process.exit(1);
   }
 
@@ -44,11 +44,11 @@ export async function runInit(targetPath?: string, preselectedTarget?: string): 
   const existing = readVersionMarker(projectDir, target);
 
   if (existing) {
-    console.log(`Existing daisdlc installation detected (v${existing.version}, target: ${existing.target}).`);
+    console.log(`Existing devflo installation detected (v${existing.version}, target: ${existing.target}).`);
     console.log("Files will be overwritten with the current version.\n");
   }
 
-  console.log(`Initializing daisdlc v${version} for ${target} in ${projectDir}\n`);
+  console.log(`Initializing devflo v${version} for ${target} in ${projectDir}\n`);
 
   const copied = copyTemplates(templatesDir, projectDir, target);
   writeVersionMarker(projectDir, target, version);
@@ -60,7 +60,7 @@ export async function runInit(targetPath?: string, preselectedTarget?: string): 
     console.log(`  ${relative}`);
   }
 
-  const markerLoc = target === "cursor" ? ".cursor/.daisdlc" : ".claude/.daisdlc";
+  const markerLoc = target === "cursor" ? ".cursor/.devflo" : ".claude/.devflo";
   console.log(`\nVersion marker written to ${markerLoc}`);
   console.log("\nDone! Your project is set up with the AI SDLC workflow.");
 }

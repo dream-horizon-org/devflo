@@ -41,7 +41,7 @@ export async function runUpdate(targetPath?: string, preselectedTarget?: string)
 
   if (!existsSync(templatesDir)) {
     console.error("Error: templates directory not found at", templatesDir);
-    console.error("This is likely a packaging issue. Please reinstall daisdlc.");
+    console.error("This is likely a packaging issue. Please reinstall devflo.");
     process.exit(1);
   }
 
@@ -54,7 +54,7 @@ export async function runUpdate(targetPath?: string, preselectedTarget?: string)
   }
 
   if (existing) {
-    console.log(`Updating daisdlc from v${existing.version} to v${version} (target: ${target})\n`);
+    console.log(`Updating devflo from v${existing.version} to v${version} (target: ${target})\n`);
   } else {
     console.log(`No existing installation found. Installing v${version} for ${target}\n`);
   }
@@ -69,7 +69,7 @@ export async function runUpdate(targetPath?: string, preselectedTarget?: string)
     console.log(`  ${relative}`);
   }
 
-  const markerLoc = target === "cursor" ? ".cursor/.daisdlc" : ".claude/.daisdlc";
+  const markerLoc = target === "cursor" ? ".cursor/.devflo" : ".claude/.devflo";
   console.log(`\nVersion marker updated to v${version} in ${markerLoc}`);
   console.log("\nDone! AI SDLC workflow files are up to date.");
 }
