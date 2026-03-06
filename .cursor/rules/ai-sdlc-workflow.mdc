@@ -63,6 +63,17 @@ Every response advancing the workflow must start with:
 
 > **[Phase X — \<Name\>]** | Change: `<name>` | Classification: `<type>` | Pipeline: `<id>`
 
+On every phase entry, update `status.yaml`: set the current phase's status to `in_progress`, `last_active_phase` to the phase number (PM=1, Architect=2, Dev=3, QA=4, Deliver=5), and `last_active_at` to the current ISO timestamp.
+
+---
+
+## Workspace Initialization (auto-triggered after Phase 0)
+
+After Phase 0 classification, before entering any subsequent phase:
+
+1. Derive a kebab-case change name. Run `devflo spec init --tools none` (if `openspec/` doesn't exist), then `devflo spec change create <name>` and `devflo spec change generate-templates <name>`.
+2. Create `status.yaml` in the change workspace with: `change_name`, `classification`, `pipeline`, `created_at`, `original_request` (user's request text), `last_active_phase` (1, or 3 for Trivial), `last_active_at`, and a `phases` map (pm, architect, developer with tasks_completed/tasks_pending, qa, test_summary, close — all initially pending). See `/devflo-plan` command for the full schema.
+
 ---
 
 ## Spec Drift Check (Pre-Phase 1, non-Trivial only)
@@ -168,10 +179,12 @@ Immediately proceed to Phase 6.
 | **ARCH REVISE** | Return to Phase 2. Invalidates `tasks.md`. Revokes Gate B. Completed tasks preserved. |
 | **CHANGE CANCEL** | Cancel all pending tasks. Archive workspace as cancelled. No DELIVERED.md entry. |
 | **SKIP QA** | Trivial only. Refused for all other classifications. |
-| **PAUSE** | Bookmark phase. Resume on next message with phase marker. |
+| **PAUSE** | Bookmark phase. Resume in the same session with the phase marker, or in a new session with `RESUME <change-name>`. |
+| **RESUME \<change-name\>** | Read `status.yaml`, resolve the last active phase, reconstruct context from artifacts, and re-enter the workflow. Works across chat sessions. |
 
 On REVISE: inform user of invalidated artifacts, re-enter target phase, all downstream gates must be re-approved.
 On CANCEL: mark pending tasks `cancelled`, archive workspace, inform user.
+On RESUME: read `status.yaml` + OpenSpec artifacts, display resume summary, auto-enter the resolved phase. Does not skip gates.
 
 ---
 

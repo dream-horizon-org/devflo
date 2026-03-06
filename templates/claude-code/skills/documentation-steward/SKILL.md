@@ -247,3 +247,53 @@ devflo spec change archive <change-name>
 **4. Do not append to `DELIVERED.md`** — cancelled changes are not delivered.
 
 **5. Output a confirmation** including: change name, cancellation status, and any completed work that was preserved.
+
+---
+
+## Action 6 — RESUME_CHANGE
+
+Validate workspace integrity and report state for resumption. Use when the user wants to continue a change that was interrupted or paused in a previous session.
+
+```
+Progress:
+- [ ] Verify change workspace exists
+- [ ] Validate status.yaml is readable and well-formed
+- [ ] Check all referenced artifacts exist and are non-empty
+- [ ] Assess interrupted task state (if applicable)
+- [ ] Report resume readiness
+```
+
+### Steps
+
+**1. Verify the change workspace exists** at `openspec/changes/<change-name>/`. If it does not, report the error and suggest running `/devflo-plan <request>` to start a new change.
+
+**2. Validate `status.yaml` is readable and well-formed.** Check that the required fields are present: `change_name`, `classification`, `pipeline`, `created_at`, `phases`. If `last_active_phase` or `original_request` are missing, note them as recoverable gaps.
+
+**3. Check all referenced artifacts exist and are non-empty:**
+
+| Phase Status | Expected Artifacts |
+|---|---|
+| PM complete or approved | `proposal.md` populated |
+| Architect complete or approved | `design.md` and `tasks.md` populated |
+| Developer tasks completed | Source code changes on disk |
+
+For each expected artifact, verify it exists and has meaningful content (not just a template stub). Report any missing or empty artifacts.
+
+**4. Assess interrupted task state.** If `phases.developer.current_task` is set (indicating a task was interrupted mid-implementation):
+
+- Run the project test suite to determine the current code state.
+- Check if the task is marked `done` in `tasks.md` (agent finished but `status.yaml` was not updated).
+- Report whether the interrupted task appears complete, partial, or not started.
+
+**5. Report resume readiness** in a structured summary:
+
+```
+Workspace: openspec/changes/<change-name>/
+Status: Ready to resume | Issues found
+Last active: Phase <N> at <timestamp>
+Artifacts: <list with health status>
+Interrupted task: <task number and state, if applicable>
+Recommendation: <specific action to take>
+```
+
+If issues are found (missing artifacts, corrupted status), provide specific remediation steps before resuming.

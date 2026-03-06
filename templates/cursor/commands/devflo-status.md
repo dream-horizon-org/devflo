@@ -12,6 +12,7 @@ Change: <change-name>
 Classification: <classification>
 Pipeline: <pipeline>
 Created: <created_at>
+Last active: Phase <last_active_phase> at <last_active_at>
 
 Phase Status:
   Plan:         <status>
@@ -26,6 +27,8 @@ Phase Status:
    - If Plan is `complete` but not `approved`: "Reply with **PM APPROVED**, then run `/devflo-design <change-name>`."
    - If Design is `approved`: "Run `/devflo-implement <change-name> <next-pending-task>` to start implementation."
    - If Audit is `pass`: "Run `/devflo-deliver <change-name>` to finalize."
+
+4. Always include: "Run `/devflo-resume <change-name>` to automatically continue from the last active phase."
 
 ## For All Changes
 

@@ -48,7 +48,7 @@ Before writing any code, read in this order:
 2. `openspec/changes/<name>/proposal.md` — approved scope and acceptance criteria
 3. `openspec/changes/<name>/design.md` — technical approach, boundaries, interfaces, testing strategy. **Pay special attention to the Codebase Context section** for patterns, conventions, and key files.
 4. `openspec/changes/<name>/tasks.md` — focus on the selected task's description, done criteria, and related AC
-5. **Relevant source code** — understand current behavior before changing it
+5. **Relevant source code** — understand current code, behavior before changing it
 
 If any artifacts are missing or incomplete, stop and inform the user.
 

@@ -62,6 +62,9 @@ change_name: <change-name>
 classification: <classification>
 pipeline: <pipeline>
 created_at: <current ISO date>
+original_request: "<user's original request text>"
+last_active_phase: 1
+last_active_at: <current ISO timestamp>
 phases:
   pm:
     status: pending
@@ -287,7 +290,8 @@ The user may issue these commands at any point during the lifecycle:
 | **ARCH REVISE** | Return to Design. `tasks.md` is invalidated. Gate B approval is revoked. Completed tasks remain. |
 | **CHANGE CANCEL** | Abandon the change. Mark all pending tasks as `cancelled`. Archive the workspace. |
 | **SKIP QA** | Skip Audit. Allowed **only** for Trivial classification. Refused for all others. |
-| **PAUSE** | Bookmark the current phase. Resume on next message by re-emitting the phase marker. |
+| **PAUSE** | Bookmark the current phase. Resume in the same session with the phase marker, or in a new session with `RESUME <change-name>`. |
+| **RESUME \<change-name\>** | Read `status.yaml`, resolve the last active phase, reconstruct context from artifacts, and re-enter the workflow. Works across chat sessions. |
 
 ---
 

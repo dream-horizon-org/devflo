@@ -106,6 +106,7 @@ your-project/
     │   ├── devflo-implement.md
     │   ├── devflo-audit.md
     │   ├── devflo-status.md
+    │   ├── devflo-resume.md
     │   └── devflo-deliver.md
     ├── rules/
     │   ├── ai-sdlc-workflow.mdc
@@ -137,6 +138,7 @@ your-project/
     │   ├── devflo-implement.md
     │   ├── devflo-audit.md
     │   ├── devflo-status.md
+    │   ├── devflo-resume.md
     │   └── devflo-deliver.md
     └── skills/
         ├── documentation-steward/
@@ -176,11 +178,12 @@ Run phases one at a time, in any chat session. Each command checks prerequisites
 | `/devflo-audit <change-name>` | Audit | Invokes the QA Agent to review the implementation against OpenSpec artifacts. Reports pass/fail with categorized findings. |
 | `/devflo-deliver <change-name>` | Deliver | Runs the final test summary, integration verification, produces the delivered change summary, and appends to `DELIVERED.md`. |
 
-### Utility command
+### Utility commands
 
 | Command | Description |
 |---------|-------------|
 | `/devflo-status [change-name]` | Shows the current phase status of a specific change, or lists all active changes. Suggests the next command to run. |
+| `/devflo-resume <change-name>` | Reads `status.yaml`, resolves the last active phase, reconstructs context from artifacts, and re-enters the workflow automatically. Works across chat sessions. |
 
 ### Example: manual workflow
 
@@ -210,6 +213,26 @@ ARCH APPROVED
 → Change delivered
 ```
 
+### Example: resuming across sessions
+
+```
+# Session 1 — Start work, gets interrupted after Task 1
+/devflo-plan Add rate limiting to the API
+→ PM Brief produced
+PM APPROVED
+/devflo-design add-rate-limiting
+→ Design produced
+ARCH APPROVED
+/devflo-implement add-rate-limiting 1
+→ Task 1 done
+# (session ends — crash, context limit, or user closes chat)
+
+# Session 2 — Resume from where you left off
+/devflo-resume add-rate-limiting
+→ Reads status.yaml, detects Task 2 pending, auto-enters Implement phase
+→ Task 2 implemented, QA passed, change delivered
+```
+
 ### Bundled OpenSpec commands
 
 devflo bundles the [OpenSpec CLI](https://openspec.dev/) as a dependency. No separate installation is needed. All OpenSpec commands are available via `devflo spec`:
@@ -236,7 +259,7 @@ Commands persist state in `openspec/changes/<change-name>/status.yaml`, which tr
 - Gate approvals with timestamps
 - Task completion progress
 
-This enables **cross-session resumability** — start a change in one chat, continue it in another. Run `/devflo-status` at any time to see where you left off.
+This enables **cross-session resumability** — start a change in one chat, continue it in another. Run `/devflo-status` at any time to see where you left off, or `/devflo-resume <change-name>` to automatically pick up from the last active phase.
 
 ## Quick Start (TL;DR)
 

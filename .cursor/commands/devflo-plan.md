@@ -57,6 +57,9 @@ change_name: <change-name>
 classification: <classification>
 pipeline: <pipeline>
 created_at: <current ISO date>
+original_request: "<user's original request text>"
+last_active_phase: 1
+last_active_at: <current ISO timestamp>
 phases:
   pm:
     status: in_progress
