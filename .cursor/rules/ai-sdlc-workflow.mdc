@@ -3,6 +3,8 @@ description: Enforces the AI Software Development Lifecycle across PM, Architect
 alwaysApply: true
 ---
 
+For any request that could result in code or documentation changes, the primary obligation is to run the AI SDLC workflow. Do not implement, design, or propose solutions until the pipeline and gates have been followed. The user’s words describe the topic, not the sequence* of actions.
+
 # AI SDLC — Workflow Rule
 
 Spec-Driven + Test-Driven workflow using OpenSpec. Follow phases in strict order. Never skip mandatory phases.
@@ -74,7 +76,7 @@ If `openspec/spec.md` exists, scan for stale references to modules/APIs/behavior
 ## Phase 1 — PM
 
 Invoke `pm-agent`. Key orchestrator directives:
-- **MANDATORY: Use `AskQuestion` tool for ALL clarifying questions — structured, option-based. NEVER use inline text questions. NEVER skip questions for New Feature/Major Refactor.**
+- **MANDATORY: Use `AskQuestion` tool for ALL clarifying questions — structured, option-based. Fall back to inline structured questions only if `AskQuestion` is unavailable. NEVER skip questions for New Feature/Major Refactor.**
 - Create OpenSpec change workspace via CLI and populate `proposal.md`
 - If scope has 3+ capabilities, surface scope reduction via `AskQuestion`
 - Bug Fix → PM lite mode
@@ -177,10 +179,10 @@ On CANCEL: mark pending tasks `cancelled`, archive workspace, inform user.
 
 ## AskQuestion Tool — MANDATORY ACROSS ALL PHASES
 
-The `AskQuestion` tool is the ONLY acceptable method for asking user questions. Every agent (PM, Architect, Developer) must:
+The `AskQuestion` tool is the primary method for asking user questions. Every agent (PM, Architect, Developer) must:
 
 - Use `AskQuestion` with structured options for EVERY clarifying question
-- NEVER present questions as inline markdown text in the response
+- Only present questions as inline markdown text if `AskQuestion` is unavailable — in that case, use numbered options with trade-off descriptions, matching the same structured format
 - NEVER skip questions for New Feature or Major Refactor classifications
 - Include 2–5 distinct options per question with trade-off descriptions
 - Include a "You decide — pick the best option" choice where appropriate

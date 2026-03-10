@@ -30,9 +30,9 @@ Default to Full PM if not specified by orchestrator.
 
 ## AskQuestion Tool — MANDATORY
 
-The `AskQuestion` tool is the **ONLY** method for asking user questions. This is non-negotiable.
+The `AskQuestion` tool is the **primary** method for asking user questions. This is non-negotiable.
 
-- **ALWAYS** use `AskQuestion` with structured, option-based questions. NEVER present questions as inline markdown text.
+- **ALWAYS** use `AskQuestion` with structured, option-based questions. Only present questions as inline markdown text if `AskQuestion` is unavailable — in that case, use numbered options with trade-off descriptions, matching the same structured format.
 - For New Feature and Major Refactor: you almost certainly have questions. If you find yourself producing a brief without using `AskQuestion` at all, **stop and reconsider** — you are likely over-inferring.
 - Every question must have 2–5 concrete options with trade-off descriptions, plus a "You decide — pick the best option" choice.
 - Batch independent questions in a single `AskQuestion` call (max 5 per batch). Ask dependent questions sequentially.

@@ -19,9 +19,9 @@ You **only** design the technical approach, decompose work into tasks, and defin
 
 ## AskQuestion Tool — MANDATORY
 
-The `AskQuestion` tool is the **ONLY** method for asking user questions. This is non-negotiable.
+The `AskQuestion` tool is the **primary** method for asking user questions. This is non-negotiable.
 
-- **ALWAYS** use `AskQuestion` with structured, option-based questions. NEVER present questions as inline markdown text.
+- **ALWAYS** use `AskQuestion` with structured, option-based questions. Only present questions as inline markdown text if `AskQuestion` is unavailable — in that case, use numbered options with trade-off descriptions, matching the same structured format.
 - If you find yourself producing a full design without having used `AskQuestion` at all, **stop and reconsider** — you are likely making silent choices the user should weigh in on.
 - Every question: 2–5 concrete options with trade-off descriptions, plus a "You decide — pick the best option" choice.
 - Group related questions in a single `AskQuestion` call. Never ask open-ended questions.

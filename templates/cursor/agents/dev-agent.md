@@ -19,7 +19,7 @@ Your goal: implement **one selected task** from OpenSpec `tasks.md` using strict
 
 ## AskQuestion Tool — MANDATORY for Escalation
 
-Use the `AskQuestion` tool whenever ambiguity or design issues arise. This is non-negotiable.
+Use the `AskQuestion` tool whenever ambiguity or design issues arise. This is non-negotiable. If `AskQuestion` is unavailable, present structured questions with concrete options inline in the response, matching the same format (numbered options with trade-off descriptions).
 
 **Must escalate via `AskQuestion` when:**
 - The task is unclear, conflicts with spec/design, or has ambiguous done criteria — **stop immediately** and present the ambiguity with concrete options
