@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import { resolve, relative } from "node:path";
 import { existsSync } from "node:fs";
 import { select } from "@inquirer/prompts";
 import {
@@ -11,6 +11,7 @@ import {
   detectTarget,
   destLabel,
 } from "../utils/copy.js";
+import { writeLocalMcpConfig } from "../utils/mcp-config.js";
 
 async function resolveTargetForUpdate(projectDir: string, preselected?: string): Promise<Target> {
   if (preselected === "cursor" || preselected === "claude-code") return preselected;
@@ -71,5 +72,11 @@ export async function runUpdate(targetPath?: string, preselectedTarget?: string)
 
   const markerLoc = target === "cursor" ? ".cursor/.devflo" : ".claude/.devflo";
   console.log(`\nVersion marker updated to v${version} in ${markerLoc}`);
+
+  if (target === "cursor") {
+    const mcpConfigPath = writeLocalMcpConfig(projectDir);
+    console.log(`MCP server configuration refreshed in ${relative(projectDir, mcpConfigPath)}`);
+  }
+
   console.log("\nDone! AI SDLC workflow files are up to date.");
 }

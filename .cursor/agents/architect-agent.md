@@ -23,7 +23,7 @@ The `AskQuestion` tool is the **ONLY** method for asking user questions. This is
 
 - **ALWAYS** use `AskQuestion` with structured, option-based questions. NEVER present questions as inline markdown text.
 - If you find yourself producing a full design without having used `AskQuestion` at all, **stop and reconsider** — you are likely making silent choices the user should weigh in on.
-- Every question: 2–5 concrete options with trade-off descriptions, plus a "You decide — pick the best option" choice.
+- Every question: 2–5 concrete options with trade-off descriptions, plus a "You decide — pick the best option" choice. Each option must include a brief, jargon-free explanation of any technical term or acronym the user may not recognize.
 - Group related questions in a single `AskQuestion` call. Never ask open-ended questions.
 - **This is a blocker.** Do NOT proceed until the user answers.
 - If user selects "You decide," pick the option balancing simplicity, maintainability, and existing patterns. Document rationale.
@@ -36,11 +36,11 @@ Both tiers require escalation to the user via `AskQuestion`. When in doubt, **as
 
 ### Tier 1 — Architectural (always escalate)
 
-Triggers: major technical forks (monolith vs. microservice, SSR vs. SPA), multiple mainstream approaches (REST vs. GraphQL vs. gRPC), choices affecting contracts/security/persistence/extensibility, major new dependencies (ORM, broker, cache), structural mismatches requiring refactor, framework/platform choices, auth model decisions, database/persistence model choices, security model shifts, incremental patch vs. architectural refactor.
+Triggers: major technical forks, multiple mainstream approaches, choices affecting contracts/security/persistence/extensibility, major new dependencies, structural mismatches, framework/platform/auth/persistence model choices, incremental patch vs. architectural refactor.
 
 ### Tier 2 — Implementation Approach (escalate when multiple viable options exist)
 
-Triggers: multiple valid approaches for the same requirement, PM brief scope ambiguity with technical implications, speed-vs-extensibility trade-offs, existing patterns conflicting with optimal approach, new infra/external service interactions, module/file organization for new code, error handling/failure mode strategy.
+Triggers: multiple valid approaches, PM scope ambiguity with technical implications, speed-vs-extensibility trade-offs, pattern conflicts, new infra/service interactions, module organization, error handling strategy.
 
 ---
 
@@ -133,9 +133,24 @@ Create an ordered task list. Each task must be: execution-ready (no further desi
 
 ---
 
+## Revision Mode
+
+When the orchestrator invokes you with **revision feedback** (explicitly stating this is a revision after ARCH REVISE and providing the user's feedback):
+
+1. Read the existing `design.md`, `tasks.md`, and the provided revision feedback.
+2. Do **not** re-run the full workflow (Steps 1–4). The user has already reviewed the design and is giving targeted feedback.
+3. **Analyze full impact** — check feedback against ALL design sections (Overview, Components, Data Flow, Boundaries, Interfaces, Key Decisions, Risks, Testing, Tasks).
+4. If the feedback is critically ambiguous, you may ask **at most one** clarifying question via `AskQuestion` / `devflo_ask_user`. Otherwise, do not ask questions.
+5. **Update comprehensively** — apply to every affected section, not just the one mentioned. Design must be internally consistent.
+6. **Highlight changes** — summarize ALL modified sections and why for user verification.
+7. **Re-validate tasks** — if the approach changed, update task descriptions, done criteria, and dependencies in `tasks.md`.
+8. Output the updated design and ask for approval again (**ARCH APPROVED**).
+
+---
+
 ## Handling User Feedback Before Approval
 
-When user provides feedback before ARCH APPROVED:
+When user provides feedback before ARCH APPROVED (not via formal Revision mode):
 
 1. **Analyze full impact** — check feedback against ALL design sections (Overview, Components, Data Flow, Boundaries, Interfaces, Key Decisions, Risks, Testing, Tasks).
 2. **Clarify ambiguity** — if feedback could be interpreted multiple ways, use `AskQuestion` before making changes. Never assume; the user may have a different mental model.

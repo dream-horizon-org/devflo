@@ -16,6 +16,7 @@
   },
   "files": [
     "dist",
+    "mcp",
     "templates"
   ],
   "repository": {
@@ -26,10 +27,14 @@
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
+    "build:cli": "tsc && chmod +x dist/cli.js",
+    "build:mcp-ui": "cd src/mcp/ui && npm run build",
+    "build": "npm run build:cli && npm run build:mcp-ui",
+    "clean": "rm -rf dist mcp",
+    "install:mcp-ui": "cd src/mcp/ui && npm install",
     "sync-templates": "rm -rf templates/cursor/agents templates/cursor/rules templates/cursor/skills templates/cursor/commands && cp -r .cursor/agents .cursor/rules .cursor/skills .cursor/commands templates/cursor/",
-    "prepublishOnly": "npm run sync-templates && npm run clean && npm run build"
+    "test": "vitest run",
+    "prepublishOnly": "npm run clean && npm run install:mcp-ui && npm run build"
   },
   "engines": {
     "node": ">=20"
@@ -38,10 +43,16 @@
   "dependencies": {
     "@fission-ai/openspec": "^1.2.0",
     "@inquirer/prompts": "^7.2.0",
-    "commander": "^14.0.0"
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "chrome-launcher": "^1.2.1",
+    "commander": "^14.0.0",
+    "ws": "^8.18.0",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.2",
-    "typescript": "^5"
+    "@types/ws": "^8.5.0",
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }

@@ -109,7 +109,11 @@ phases:
     approved_at: <current ISO date>
 ```
 
-If the user does not approve, wait. Do not proceed without explicit approval.
+If the user replies **PM REVISE** (with or without additional text):
+- If additional text accompanies the command → treat it as revision feedback. Re-invoke the PM Agent in **Revision mode** with that feedback. The PM must apply the feedback to the existing proposal without re-running the full question flow.
+- If no additional text → prompt the user: "Please describe what should change." Treat their next message as revision feedback and re-invoke the PM Agent in **Revision mode**.
+
+If the user does not approve or revise, wait. Do not proceed without explicit action.
 
 ---
 
@@ -146,7 +150,11 @@ phases:
     approved_at: <current ISO date>
 ```
 
-If the user does not approve, wait. Do not proceed without explicit approval.
+If the user replies **ARCH REVISE** (with or without additional text):
+- If additional text accompanies the command → treat it as revision feedback. Re-invoke the Architect Agent in **Revision mode** with that feedback. The Architect must apply the feedback to the existing design without re-running the full question flow.
+- If no additional text → prompt the user: "Please describe what should change." Treat their next message as revision feedback and re-invoke the Architect Agent in **Revision mode**.
+
+If the user does not approve or revise, wait. Do not proceed without explicit action.
 
 ---
 

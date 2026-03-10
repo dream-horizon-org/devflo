@@ -109,7 +109,11 @@ phases:
     approved_at: <current ISO date>
 ```
 
-If the user does not approve, wait. Do not proceed without explicit approval.
+If the user replies **PM REVISE** (with or without additional text):
+- If additional text accompanies the command → treat it as revision feedback. Re-invoke the PM Agent in **Revision mode** with that feedback. The PM must apply the feedback to the existing proposal without re-running the full question flow.
+- If no additional text → prompt the user: "Please describe what should change." Treat their next message as revision feedback and re-invoke the PM Agent in **Revision mode**.
+
+If the user does not approve or revise, wait. Do not proceed without explicit action.
 
 ---
 
@@ -125,7 +129,7 @@ Invoke the **Architect Agent** (`architect-agent` subagent) with:
 - The classification and pipeline
 - Instruction to read `proposal.md` for the approved PM Brief
 - Instruction to explore the codebase as needed
-- **MANDATORY instruction: The Architect MUST use the `AskQuestion` tool to ask the user at least one architectural or implementation approach question BEFORE writing the full design.** For New Feature and Major Refactor, the Architect must ask about key trade-offs (technology choices, data model decisions, API design alternatives). Skipping questions is only acceptable when the implementation has literally one possible approach with zero alternatives.
+- **MANDATORY instruction: The Architect MUST use the `devflo_ask_user` MCP tool to ask the user at least one architectural or implementation approach question BEFORE writing the full design.** For New Feature and Major Refactor, the Architect must ask about key trade-offs (technology choices, data model decisions, API design alternatives). Skipping questions is only acceptable when the implementation has literally one possible approach with zero alternatives.
 - **MANDATORY instruction: design.md must NOT contain implementation code, method bodies, pseudocode, or copy-pasteable code blocks.** Interfaces should be described in prose (method names, signatures, behavioral contracts) — not implemented.
 - Instruction to produce `design.md` and `tasks.md` in the change workspace
 
@@ -146,7 +150,11 @@ phases:
     approved_at: <current ISO date>
 ```
 
-If the user does not approve, wait. Do not proceed without explicit approval.
+If the user replies **ARCH REVISE** (with or without additional text):
+- If additional text accompanies the command → treat it as revision feedback. Re-invoke the Architect Agent in **Revision mode** with that feedback. The Architect must apply the feedback to the existing design without re-running the full question flow.
+- If no additional text → prompt the user: "Please describe what should change." Treat their next message as revision feedback and re-invoke the Architect Agent in **Revision mode**.
+
+If the user does not approve or revise, wait. Do not proceed without explicit action.
 
 ---
 

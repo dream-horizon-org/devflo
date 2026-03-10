@@ -190,6 +190,22 @@ Repeat until **QA PASS**.
 
 ---
 
+## DevFlo Dashboard Integration
+
+After producing findings, call `devflo_update_qa_results`:
+```
+verdict: "pass" | "fail"
+findings: [{ id, severity, description, file, line, fixType }]
+summary: "Brief QA summary"
+```
+
+Call `devflo_log_event` at key milestones:
+- When starting review: `{ phase: "QA", agent: "qa", message: "Starting QA review for Task #N", eventType: "info" }`
+- On QA PASS: `{ phase: "QA", agent: "qa", message: "QA PASS — all criteria met", eventType: "success" }`
+- On QA FAIL: `{ phase: "QA", agent: "qa", message: "QA FAIL — N blockers, M majors", eventType: "error" }`
+
+---
+
 ## Output Wrapper
 
 1. **Phase marker**: `[Phase 4 — QA] | Change: <name> | Task: #<number> — <title> | Review: #<iteration>`

@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import { resolve, relative } from "node:path";
 import { existsSync } from "node:fs";
 import { select } from "@inquirer/prompts";
 import {
@@ -10,6 +10,7 @@ import {
   copyTemplates,
   destLabel,
 } from "../utils/copy.js";
+import { writeLocalMcpConfig } from "../utils/mcp-config.js";
 
 async function resolveTarget(preselected?: string): Promise<Target> {
   if (preselected === "cursor" || preselected === "claude-code") return preselected;
@@ -62,5 +63,11 @@ export async function runInit(targetPath?: string, preselectedTarget?: string): 
 
   const markerLoc = target === "cursor" ? ".cursor/.devflo" : ".claude/.devflo";
   console.log(`\nVersion marker written to ${markerLoc}`);
+
+  if (target === "cursor") {
+    const mcpConfigPath = writeLocalMcpConfig(projectDir);
+    console.log(`MCP server configured in ${relative(projectDir, mcpConfigPath)}`);
+  }
+
   console.log("\nDone! Your project is set up with the AI SDLC workflow.");
 }

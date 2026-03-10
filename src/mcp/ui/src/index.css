@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #161b22;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+  }
+}
+
+/* Tiptap rich text editor */
+.prose-editor {
+  color: #e6edf3;
+  font-size: 0.875rem;
+  line-height: 1.625;
+}
+.prose-editor p {
+  margin: 0.25em 0;
+}
+.prose-editor h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.25em;
+  color: #e6edf3;
+}
+.prose-editor h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.25em;
+  color: #e6edf3;
+}
+.prose-editor ul,
+.prose-editor ol {
+  padding-left: 1.5em;
+  margin: 0.25em 0;
+}
+.prose-editor ul {
+  list-style: disc;
+}
+.prose-editor ol {
+  list-style: decimal;
+}
+.prose-editor li {
+  margin: 0.15em 0;
+}
+.prose-editor blockquote {
+  border-left: 3px solid #30363d;
+  padding-left: 0.75em;
+  margin: 0.5em 0;
+  color: #8b949e;
+}
+.prose-editor code {
+  background: #21262d;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-family: ui-monospace, monospace;
+  color: #e6edf3;
+}
+.prose-editor pre {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.75em;
+  margin: 0.5em 0;
+  overflow-x: auto;
+}
+.prose-editor pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+.prose-editor strong {
+  font-weight: 600;
+  color: #e6edf3;
+}
+.prose-editor em {
+  font-style: italic;
+}
+.prose-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #484f58;
+  pointer-events: none;
+  height: 0;
+}
+
+/* File viewer markdown */
+.file-viewer-markdown h1 { font-size: 1.25rem; font-weight: 700; margin: 0.75em 0 0.25em; color: #e6edf3; }
+.file-viewer-markdown h2 { font-size: 1.1rem; font-weight: 600; margin: 0.75em 0 0.25em; color: #e6edf3; }
+.file-viewer-markdown h3 { font-size: 0.95rem; font-weight: 600; margin: 0.5em 0 0.25em; color: #e6edf3; }
+.file-viewer-markdown p { margin: 0.4em 0; }
+.file-viewer-markdown ul, .file-viewer-markdown ol { padding-left: 1.5em; margin: 0.25em 0; }
+.file-viewer-markdown ul { list-style: disc; }
+.file-viewer-markdown ol { list-style: decimal; }
+.file-viewer-markdown li { margin: 0.15em 0; }
+.file-viewer-markdown blockquote { border-left: 3px solid #30363d; padding-left: 0.75em; margin: 0.5em 0; color: #8b949e; }
+.file-viewer-markdown code { background: #21262d; padding: 0.15em 0.35em; border-radius: 4px; font-size: 0.8rem; font-family: ui-monospace, monospace; }
+.file-viewer-markdown pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.75em; margin: 0.5em 0; overflow-x: auto; }
+.file-viewer-markdown pre code { background: none; padding: 0; }
+.file-viewer-markdown strong { font-weight: 600; color: #e6edf3; }
+.file-viewer-markdown a { color: #58a6ff; text-decoration: underline; }
+.file-viewer-markdown hr { border: none; border-top: 1px solid #30363d; margin: 1em 0; }
+.file-viewer-markdown table { border-collapse: collapse; margin: 0.5em 0; width: 100%; }
+.file-viewer-markdown th, .file-viewer-markdown td { border: 1px solid #30363d; padding: 0.4em 0.75em; text-align: left; }
+.file-viewer-markdown th { background: #21262d; font-weight: 600; color: #e6edf3; }

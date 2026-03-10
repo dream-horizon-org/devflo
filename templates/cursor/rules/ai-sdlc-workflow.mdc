@@ -3,6 +3,8 @@ description: Enforces the AI Software Development Lifecycle across PM, Architect
 alwaysApply: true
 ---
 
+For any request that could result in code or documentation changes, the primary obligation is to run the AI SDLC workflow. Do not implement, design, or propose solutions until the pipeline and gates have been followed. The user’s words describe the topic, not the sequence* of actions.
+
 # AI SDLC — Workflow Rule
 
 Spec-Driven + Test-Driven workflow using OpenSpec. Follow phases in strict order. Never skip mandatory phases.
@@ -53,7 +55,12 @@ Classify as: **Trivial** | **Bug Fix** | **Small Change** | **New Feature** | **
 **Next:** Proceeding to Phase <X>.
 ```
 
-Immediately invoke next phase's agent. No commentary, no waiting for user input.
+Immediately after classification:
+1. Call `devflo_set_change_context` with name, classification, and pipeline. This seeds all 7 canonical phases (marking skipped phases from the pipeline).
+2. Call `devflo_update_phase` with `phaseName: "Classification"`, `status: "completed"` to mark Phase 0 done.
+3. Call `devflo_log_event` with phase "Classification", agent "orchestrator", message summarizing the classification.
+
+Then invoke next phase's agent. No commentary, no waiting for user input.
 
 ---
 
@@ -62,6 +69,8 @@ Immediately invoke next phase's agent. No commentary, no waiting for user input.
 Every response advancing the workflow must start with:
 
 > **[Phase X — \<Name\>]** | Change: `<name>` | Classification: `<type>` | Pipeline: `<id>`
+
+Call `devflo_update_phase` with the single phase being updated whenever a phase transitions to a new status (active, completed, skipped). Do NOT send the full phase array — only the phase name and its new status.
 
 ---
 
@@ -74,36 +83,54 @@ If `openspec/spec.md` exists, scan for stale references to modules/APIs/behavior
 ## Phase 1 — PM
 
 Invoke `pm-agent`. Key orchestrator directives:
-- **MANDATORY: Use `AskQuestion` tool for ALL clarifying questions — structured, option-based. NEVER use inline text questions. NEVER skip questions for New Feature/Major Refactor.**
+- **MANDATORY: Use `devflo_ask_user` MCP tool for ALL clarifying questions — structured, option-based. NEVER use inline text questions. NEVER skip questions for New Feature/Major Refactor.**
 - Create OpenSpec change workspace via CLI and populate `proposal.md`
-- If scope has 3+ capabilities, surface scope reduction via `AskQuestion`
+- If scope has 3+ capabilities, surface scope reduction via `devflo_ask_user`
 - Bug Fix → PM lite mode
 
-**Stop and request PM APPROVED.**
+Call `devflo_log_event` when PM brief is complete.
+
+**Stop and request approval via `devflo_await_gate` with gate "A" and phaseName "PM".**
 
 ---
 
 ## Gate A — PM Approval
 
-User must reply exactly **PM APPROVED**. Refuse to proceed without it.
+Use `devflo_await_gate` (gate "A"). The user approves/revises/cancels via the dashboard.
+
+- If result `action` is `"approve"` → proceed to Phase 2.
+- If result `action` is `"revise"`:
+  - If `feedback` is present in the result → re-invoke `pm-agent` in **Revision mode** with that feedback. The PM must apply the feedback to the existing proposal without re-running the full question flow.
+  - If `feedback` is absent → the user chose to type feedback in the Cursor chat. Prompt the user: "Gate revised. Please type your revision feedback in this chat." Then treat the next user message as revision feedback and re-invoke `pm-agent` in **Revision mode** with it.
+- If result `action` is `"cancel"` → execute CHANGE CANCEL.
 
 ---
 
 ## Phase 2 — Architect
 
 Invoke `architect-agent`. Key orchestrator directives:
-- **MANDATORY: Use `AskQuestion` tool to ask at least one architectural/approach question BEFORE writing the full design. NEVER skip for New Feature/Major Refactor. For Small Change, skip ONLY when literally one approach exists with zero alternatives.**
-- Validate approach with user via `AskQuestion` before producing full design
+- **MANDATORY: Use `devflo_ask_user` MCP tool to ask at least one architectural/approach question BEFORE writing the full design. NEVER skip for New Feature/Major Refactor. For Small Change, skip ONLY when literally one approach exists with zero alternatives.**
+- Validate approach with user via `devflo_ask_user` before producing full design
 - Populate `design.md` and `tasks.md` in the OpenSpec change workspace
 - Define test strategy and produce ordered, dependency-aware task list
 
-**Stop and request ARCH APPROVED.**
+Call `devflo_log_event` when design is complete. Call `devflo_update_tasks` with the initial task list from `tasks.md`.
+
+**Stop and request approval via `devflo_await_gate` with gate "B" and phaseName "Architect".**
 
 ---
 
 ## Gate B — Architect Approval
 
-User must reply exactly **ARCH APPROVED**. No implementation may begin before this gate.
+Use `devflo_await_gate` (gate "B"). The user approves/revises/cancels via the dashboard.
+
+- If result `action` is `"approve"` → proceed to Phase 3.
+- If result `action` is `"revise"`:
+  - If `feedback` is present in the result → re-invoke `architect-agent` in **Revision mode** with that feedback. The Architect must apply the feedback to the existing design without re-running the full question flow.
+  - If `feedback` is absent → the user chose to type feedback in the Cursor chat. Prompt the user: "Gate revised. Please type your revision feedback in this chat." Then treat the next user message as revision feedback and re-invoke `architect-agent` in **Revision mode** with it.
+- If result `action` is `"cancel"` → execute CHANGE CANCEL.
+
+No implementation may begin before this gate.
 
 ---
 
@@ -112,9 +139,11 @@ User must reply exactly **ARCH APPROVED**. No implementation may begin before th
 After Gate B (or directly after Phase 0 for Trivial):
 
 1. Auto-select tasks in dependency order from `tasks.md`. Do NOT ask user which task.
-2. Invoke `dev-agent` per task. TDD mandatory (strict default; iterative TDD permitted for new interfaces being defined for the first time).
-3. Update task status in OpenSpec on completion.
-4. Immediately proceed to next task. Do NOT pause between tasks.
+2. Before each task, call `devflo_update_tasks` with the task set to `in_progress`.
+3. Invoke `dev-agent` per task. TDD mandatory (strict default; iterative TDD permitted for new interfaces being defined for the first time).
+4. On completion, call `devflo_update_tasks` with the task set to `completed`. Call `devflo_log_event` with agent "dev".
+5. Update task status in OpenSpec on completion.
+6. Immediately proceed to next task. Do NOT pause between tasks.
 
 Trivial: no formal task list needed — the change is the single task.
 
@@ -123,10 +152,11 @@ Trivial: no formal task list needed — the change is the single task.
 ## Phase 4 — QA (auto-starts, no permission needed)
 
 1. Invoke `qa-agent`. Do NOT ask user for permission.
-2. If QA FAIL (Blockers/Majors remain): Dev fixes → QA re-reviews flagged issues only. Repeat until QA PASS.
-3. QA must provide file paths, line numbers, concrete fix descriptions. Classify as **surgical** (single-location) or **structural** (approach revision).
-4. Surgical-only fixes → Developer gets targeted checklist, not full re-analysis.
-5. On QA PASS → immediately proceed to Phase 5.
+2. After QA produces findings, call `devflo_update_qa_results` with the verdict and findings.
+3. If QA FAIL (Blockers/Majors remain): Dev fixes → QA re-reviews flagged issues only. Repeat until QA PASS. Update `devflo_update_qa_results` after each re-review.
+4. QA must provide file paths, line numbers, concrete fix descriptions. Classify as **surgical** (single-location) or **structural** (approach revision).
+5. Surgical-only fixes → Developer gets targeted checklist, not full re-analysis.
+6. On QA PASS → call `devflo_log_event` with "QA PASS" and immediately proceed to Phase 5.
 
 ---
 
@@ -147,7 +177,7 @@ Run full test suite. Verify cross-task integration: interface mismatches, behavi
 | Integration verification result | If multi-task |
 | Notes | If tests couldn't run locally |
 
-Immediately proceed to Phase 6.
+Call `devflo_update_test_summary` with all fields above. Then immediately proceed to Phase 6.
 
 ---
 
@@ -175,17 +205,49 @@ On CANCEL: mark pending tasks `cancelled`, archive workspace, inform user.
 
 ---
 
-## AskQuestion Tool — MANDATORY ACROSS ALL PHASES
+## DevFlo Dashboard MCP Tools
 
-The `AskQuestion` tool is the ONLY acceptable method for asking user questions. Every agent (PM, Architect, Developer) must:
+All user interactions and lifecycle tracking go through the DevFlo Dashboard via MCP tools.
 
-- Use `AskQuestion` with structured options for EVERY clarifying question
+### Asking Questions — `devflo_ask_user` (MANDATORY)
+
+The ONLY acceptable method for asking user questions. Every agent (PM, Architect, Developer) must:
+
+- Use `devflo_ask_user` with structured options for EVERY clarifying question
 - NEVER present questions as inline markdown text in the response
 - NEVER skip questions for New Feature or Major Refactor classifications
-- Include 2–5 distinct options per question with trade-off descriptions
+- Include 2–5 distinct options per question with trade-off descriptions and jargon-free explanations of technical terms/acronyms
 - Include a "You decide — pick the best option" choice where appropriate
-- Group related questions in a single `AskQuestion` call; batch independent questions
-- This is a blocker — do NOT proceed until the user answers
+- Group related questions in a single `devflo_ask_user` call (pass multiple questions in the `questions` array)
+- This is a blocker — do NOT proceed until the user answers via the dashboard
+
+### Phase Tracking — `devflo_update_phase` (MANDATORY)
+
+Call at every phase transition. Send only the **single phase** being updated — the server maintains the full phase list (seeded from the pipeline at `devflo_set_change_context`). When a phase becomes `active`, the server auto-completes the previously active phase (unless it has a pending gate). Params: `phaseName` (e.g. "Classification", "PM", "Developer"), `status` (pending|active|completed|skipped), `classification?`, `changeName?`, `confidence?`.
+
+### Change Context — `devflo_set_change_context`
+
+Call once after Phase 0. Seeds all 7 canonical phases (Classification, PM, Architect, Developer, QA, Test Summary, Cleanup) with skipped phases derived from the pipeline. Params: `name`, `classification`, `pipeline`, `workspacePath?`.
+
+### Gate Approvals — `devflo_await_gate`
+
+Call at Gate A/B instead of waiting for text input. Params: `gate` ("A"|"B"), `phaseName` ("PM"|"Architect"), `summary?`. Returns: `{ action: "approve"|"revise"|"cancel", feedback?: string }`. When `action` is `"revise"` and `feedback` is present, the user typed revision instructions in the dashboard — pass them directly to the agent in Revision mode. When `feedback` is absent, the user will type feedback in the Cursor chat instead.
+
+### Task Board — `devflo_update_tasks`
+
+Call when tasks are available and on status changes. Params: `tasks` (array of {id, title, status: pending|in_progress|completed|failed|cancelled, description?}).
+
+### Activity Log — `devflo_log_event`
+
+Call at key milestones. Params: `phase`, `agent` (pm|architect|dev|qa|orchestrator), `message`, `eventType` (info|success|warning|error).
+
+### QA Results — `devflo_update_qa_results`
+
+Call during Phase 4. Params: `verdict` (pass|fail|pending), `findings` (array of {id, severity: blocker|major|minor|nit, description, file?, line?, fixType?: surgical|structural}), `summary?`.
+
+### Test Summary — `devflo_update_test_summary`
+
+Call during Phase 5. Params: `commands`, `suites`, `total`, `passed`, `failed`, `skipped`, `integrationResult?`, `notes?`.
 
 ---
 

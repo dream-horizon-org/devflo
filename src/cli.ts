@@ -6,7 +6,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runInit } from "./commands/init.js";
 import { runUpdate } from "./commands/update.js";
+import { runDashboard } from "./commands/dashboard.js";
 import { registerSpecCommand } from "./commands/spec.js";
+import { startMcpServer } from "./mcp/server.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -40,6 +42,30 @@ program
   .option("-t, --target <target>", "target IDE: cursor or claude-code (overrides auto-detect)")
   .action(async (targetPath: string, opts: { target?: string }) => {
     await runUpdate(targetPath, opts.target);
+  });
+
+program
+  .command("dashboard")
+  .description("Open the DevFlo SDLC Dashboard in a browser window")
+  .argument("[path]", "target project directory", process.cwd())
+  .option(
+    "--headless",
+    "do not open a browser; only print the dashboard URL (server must already be running)",
+  )
+  .action((targetPath: string, opts: { headless?: boolean }) => {
+    runDashboard(targetPath, opts.headless);
+  });
+
+program
+  .command("mcp-serve")
+  .description("Start the DevFlo MCP server (used by Cursor — not intended for direct use)")
+  .action(async () => {
+    try {
+      await startMcpServer();
+    } catch (err) {
+      process.stderr.write(`DevFlo MCP server failed to start: ${err}\n`);
+      process.exit(1);
+    }
   });
 
 registerSpecCommand(program);

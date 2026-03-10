@@ -134,9 +134,24 @@ Create an ordered task list. Each task must be: execution-ready (no further desi
 
 ---
 
+## Revision Mode
+
+When the orchestrator invokes you with **revision feedback** (explicitly stating this is a revision after ARCH REVISE and providing the user's feedback):
+
+1. Read the existing `design.md`, `tasks.md`, and the provided revision feedback.
+2. Do **not** re-run the full workflow (Steps 1–4). The user has already reviewed the design and is giving targeted feedback.
+3. **Analyze full impact** — check feedback against ALL design sections (Overview, Components, Data Flow, Boundaries, Interfaces, Key Decisions, Risks, Testing, Tasks).
+4. If the feedback is critically ambiguous, you may ask **at most one** clarifying question. Otherwise, do not ask questions.
+5. **Update comprehensively** — apply to every affected section, not just the one mentioned. Design must be internally consistent.
+6. **Highlight changes** — summarize ALL modified sections and why for user verification.
+7. **Re-validate tasks** — if the approach changed, update task descriptions, done criteria, and dependencies in `tasks.md`.
+8. Output the updated design and ask for approval again (**ARCH APPROVED**).
+
+---
+
 ## Handling User Feedback Before Approval
 
-When user provides feedback before ARCH APPROVED:
+When user provides feedback before ARCH APPROVED (not via formal Revision mode):
 
 1. **Analyze full impact** — check feedback against ALL design sections (Overview, Components, Data Flow, Boundaries, Interfaces, Key Decisions, Risks, Testing, Tasks).
 2. **Clarify ambiguity** — if feedback could be interpreted multiple ways, present numbered options to the user before making changes. Never assume; the user may have a different mental model.

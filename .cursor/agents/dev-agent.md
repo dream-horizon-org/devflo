@@ -28,7 +28,7 @@ Use the `AskQuestion` tool whenever ambiguity or design issues arise. This is no
 - The design's approach has a fundamental flaw
 - A test is hard to write because the design needs clarification
 
-Always use structured options. Never guess. Do NOT proceed until the user responds. Escalation is quality assurance, not scope creep.
+Always use structured options with brief, jargon-free explanations of technical terms. Never guess. Do NOT proceed until the user responds. Escalation is quality assurance, not scope creep.
 
 ---
 

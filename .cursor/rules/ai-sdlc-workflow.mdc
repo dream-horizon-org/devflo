@@ -3,6 +3,8 @@ description: Enforces the AI Software Development Lifecycle across PM, Architect
 alwaysApply: true
 ---
 
+For any request that could result in code or documentation changes, the primary obligation is to run the AI SDLC workflow. Do not implement, design, or propose solutions until the pipeline and gates have been followed. The user’s words describe the topic, not the sequence* of actions.
+
 # AI SDLC — Workflow Rule
 
 Spec-Driven + Test-Driven workflow using OpenSpec. Follow phases in strict order. Never skip mandatory phases.
@@ -87,6 +89,10 @@ Invoke `pm-agent`. Key orchestrator directives:
 
 User must reply exactly **PM APPROVED**. Refuse to proceed without it.
 
+When the gate returns `"revise"`:
+- If `feedback` is present → re-invoke `pm-agent` in **Revision mode** with that feedback. The PM must apply the feedback to the existing proposal without re-running the full question flow.
+- If `feedback` is absent → the user chose to type feedback in the Cursor chat. Prompt the user: "Gate revised. Please type your revision feedback in this chat." Then treat the next user message as revision feedback and re-invoke `pm-agent` in **Revision mode** with it.
+
 ---
 
 ## Phase 2 — Architect
@@ -104,6 +110,10 @@ Invoke `architect-agent`. Key orchestrator directives:
 ## Gate B — Architect Approval
 
 User must reply exactly **ARCH APPROVED**. No implementation may begin before this gate.
+
+When the gate returns `"revise"`:
+- If `feedback` is present → re-invoke `architect-agent` in **Revision mode** with that feedback. The Architect must apply the feedback to the existing design without re-running the full question flow.
+- If `feedback` is absent → the user chose to type feedback in the Cursor chat. Prompt the user: "Gate revised. Please type your revision feedback in this chat." Then treat the next user message as revision feedback and re-invoke `architect-agent` in **Revision mode** with it.
 
 ---
 
@@ -182,7 +192,7 @@ The `AskQuestion` tool is the ONLY acceptable method for asking user questions. 
 - Use `AskQuestion` with structured options for EVERY clarifying question
 - NEVER present questions as inline markdown text in the response
 - NEVER skip questions for New Feature or Major Refactor classifications
-- Include 2–5 distinct options per question with trade-off descriptions
+- Include 2–5 distinct options per question with trade-off descriptions and jargon-free explanations of technical terms/acronyms
 - Include a "You decide — pick the best option" choice where appropriate
 - Group related questions in a single `AskQuestion` call; batch independent questions
 - This is a blocker — do NOT proceed until the user answers
