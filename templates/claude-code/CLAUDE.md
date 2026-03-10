@@ -82,6 +82,10 @@ Invoke the `pm-agent` agent. Key orchestrator directives:
 
 User must reply exactly **PM APPROVED**. Refuse to proceed without it.
 
+When the user replies **PM REVISE** (with or without additional text):
+- If additional text accompanies the command → treat it as revision feedback. Re-invoke `pm-agent` in **Revision mode** with that feedback. The PM must apply the feedback to the existing proposal without re-running the full question flow.
+- If no additional text → prompt the user: "Please describe what should change." Treat their next message as revision feedback and re-invoke `pm-agent` in **Revision mode**.
+
 ---
 
 ## Phase 2 — Architect
@@ -99,6 +103,10 @@ Invoke the `architect-agent` agent. Key orchestrator directives:
 ## Gate B — Architect Approval
 
 User must reply exactly **ARCH APPROVED**. No implementation may begin before this gate.
+
+When the user replies **ARCH REVISE** (with or without additional text):
+- If additional text accompanies the command → treat it as revision feedback. Re-invoke `architect-agent` in **Revision mode** with that feedback. The Architect must apply the feedback to the existing design without re-running the full question flow.
+- If no additional text → prompt the user: "Please describe what should change." Treat their next message as revision feedback and re-invoke `architect-agent` in **Revision mode**.
 
 ---
 
