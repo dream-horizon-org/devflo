@@ -25,21 +25,10 @@ AI Software Development Lifecycle for [Cursor](https://cursor.com) and [Claude C
 
 ## Setup
 
-### 1. Configure the GitHub Packages registry
-
-Create or edit `~/.npmrc` in your home directory and add:
-
-```
-@dream-horizon-org:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-```
-
-Replace `YOUR_GITHUB_TOKEN` with a GitHub PAT that has `read:packages` scope.
-
-### 2. Install globally
+### 1. Install globally
 
 ```bash
-npm install -g @dream-horizon-org/devflo
+npm install -g @dreamhorizonorg/devflo
 ```
 
 ## Usage
